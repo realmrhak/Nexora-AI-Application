@@ -1,0 +1,6 @@
+ npm init -y
+npm i bcryptjs cors dotenv express express-validator jsonwebtoken mongoose multer pdf-parse @google/genai
+npm i nodemon --save-dev
+
+
+
