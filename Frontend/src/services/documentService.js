@@ -1,4 +1,4 @@
-import axioInstance from '../utils/axios Instance';
+import axiosInstance from '../utils/axiosInstance';
 import { API_PATHS } from '../utils/apiPaths';
 
 const getDocuments = async () => {
