@@ -264,6 +264,59 @@ const DocumentListPage = () => {
                     </div>
                 </div >
             )}
+
+           {isDeleteModalOpen && ( <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+                <div className="relative w-full max-w-md bg-white/95 backdrop-blur-xl border border-slate-200/60 rounded-2xl shadow-2xl shadow-slate-900/20 p-8">
+                    {/* Close Button */}
+                    <button className="absolute top-6 right-6 w08 h-8 flex- items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all duration-200" onClick={() => setIsDeleteModalOpen(false)}>
+                        <X className='w-5 h-5' strokeWidth={2} />
+                    </button>
+
+                    {/* Modal Header */}
+                    <div className="mb-6">
+                        <div className="w-12 h-12 rounded-xl bg-linear-to-r from-red-100 to-red-200 flex items-center justify-center mb-4">
+                            <Trash2 className='w-6 h-6 text-red-600' strokeWidth={2} />
+                        </div>
+                        <h2 className="text-xl font-medium text-slate-900 tracking-tight">
+                            Confirm Deletion
+                        </h2>
+                    </div>
+
+                    {/* Content */}
+                    <p className="text-sm text-slate-600 mb-6">
+                        Are you sure you want to delete the document:{" "}
+                        <span className="font-semibold text-slate-900">
+                            {selectedDoc?.title}
+                        </span>
+                        ? This action cannot be undone.
+                    </p>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-3">
+                        <button className="flex-1 h-11 px-4 border-2 border-slate-200 rounded-xl bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed" 
+                        type='button'
+                        onClick={() => setIsDeleteModalOpen(false)}
+                        disabled={deleting}
+                        >
+                            Cancel
+                        </button>
+                        <button className='flex-1 h-11 px-4 bg-linear-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-red-500/25 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]'
+                        disabled={deleting}
+                        onClick={handleConfirmDelete} >
+                            {deleting ? (
+                                <span className="flex items-center justify-center gap-2">
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    Deleting...
+                                </span>
+                            ) : (
+                                "Delete"
+                            )}
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+            )}
         </div >
 
     )

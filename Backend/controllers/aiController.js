@@ -254,11 +254,9 @@ export const chat = async (req, res, next) => {
         const { documentId, question } = req.body;
 
         if (!documentId || !question) {
-
             return res.status(400).json({
                 success: false,
-                error: 'Please provide documentId and question',
-                statusCode: 400
+                error: 'Please provide documentId and question'
             });
         }
 
@@ -271,61 +269,56 @@ export const chat = async (req, res, next) => {
         if (!document) {
             return res.status(404).json({
                 success: false,
-                error: 'Document not found or not ready',
-                statusCode: 404
+                error: 'Document not found'
             });
         }
 
-
-        // Find relevant chunks
         const relevantChunks = findRelevantChunks(document.chunks, question, 3);
-        const chunkIndices = relevantChunks.map(c => c.chunkIndex);
 
-        // Get or create chat history
+        console.log("Chunks:", relevantChunks.length);
+
+        const answer = await deepseekService.chatWithContext(
+            question,
+            relevantChunks
+        );
+
+        console.log("AI Answer:", answer);
+
+        if (!answer) {
+            return res.status(500).json({
+                success: false,
+                error: 'AI returned empty response'
+            });
+        }
+
         let chatHistory = await ChatHistory.findOne({
             userId: req.user._id,
-            documentId: document._id
+            documentId
         });
 
         if (!chatHistory) {
             chatHistory = await ChatHistory.create({
                 userId: req.user._id,
-                documentId: document._id,
+                documentId,
                 messages: []
             });
         }
-        // Generate response using Deepseek
-        const answer = await deepseekService.chatWithContext(question, relevantChunks);
 
-        // Save conversation
         chatHistory.messages.push(
-            {
-                role: 'user',
-                content: question,
-                timestamp: new Date(),
-                relevantChunks: []
-            },
-            {
-                role: 'assistant',
-                content: answer,
-                timestamp: new Date(),
-                relevantChunks: chunkIndices
-            }
+            { role: 'user', content: question, timestamp: new Date() },
+            { role: 'assistant', content: answer, timestamp: new Date() }
         );
+
         await chatHistory.save();
 
         res.status(200).json({
             success: true,
-            data: {
-                question,
-                answer,
-                relevantChunks: chunkIndices, chatHistoryId: chatHistory._id
-            },
-            message: 'Response generated successfully'
+            data: { question, answer }
         });
 
     } catch (error) {
-        next(error)
+        console.error("CHAT ERROR:", error);
+        next(error);
     }
 };
 

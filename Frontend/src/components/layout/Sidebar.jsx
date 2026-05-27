@@ -28,18 +28,29 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
         aria-hidden="true"
       ></div>
 
-      <aside className={`fixed top-0 left-0 h-full w-64 bg-white/90 backdrop-blur-lg border-r border-slate-200/60 z-50 
-md:relative md:w-64 md:shrink-0 md:flex md:flex-col 
-transition-transform duration-300 ease-in-out 
-${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
-md:translate-x-0`}>
+      <aside
+        className={`
+    fixed top-0 left-0 h-screen w-64
+    bg-white/90 backdrop-blur-xl
+    border-r border-slate-200/60
+    z-50 flex flex-col
+    transition-transform duration-300 ease-in-out
+
+    ${isSidebarOpen
+            ? 'translate-x-0'
+            : '-translate-x-full'}
+
+    md:translate-x-0
+    md:sticky md:top-0
+  `}
+      >
         <div className="flex items-center justify-between h-16 px-5 border-b border-slate-200/60">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-linear-to-br from-emerald-400 to-teal-500 shadow-md shadow-emerald-500/20">
               <BrainCircuit className="text-white" size={20} strokeWidth={2.5} />
             </div>
             <h1 className="text-sm md:text-base font-bold text-slate-900">
-              AI Learning Assistant
+            Nexora AI
             </h1>
           </div>
 
@@ -51,7 +62,7 @@ md:translate-x-0`}>
           </button>
         </div>
 
-        <nav className="flex-1 px-3 py-6 space-y-1.5">
+        <nav className="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto">
           {navLinks.map((link) => {
             const Icon = link.icon;
             return (
@@ -82,7 +93,7 @@ md:translate-x-0`}>
           })}
         </nav>
 
-        <div className="px-3 py-4 border-t border-slate-200/60">
+        <div className="mt-auto px-3 py-4 border-t border-slate-200/60">
           <button
             onClick={handleLogout}
             className="group flex items-center gap-3 w-full px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-600 rounded-xl"

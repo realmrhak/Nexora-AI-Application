@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
@@ -49,14 +49,12 @@ export const AuthProvider = ({ children }) => {
 
   // ✅ Logout
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
 
-    setUser(null);
-    setIsAuthenticated(false);
-
-    window.location.href = "/";
-  };
+  setUser(null);
+  setIsAuthenticated(false);
+};
 
   // ✅ Update user
   const updateUser = (updatedUserData) => {

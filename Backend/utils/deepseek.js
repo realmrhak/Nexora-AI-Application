@@ -1,199 +1,340 @@
 import OpenAI from "openai";
 
-const DEFAULT_MODEL = "deepseek/deepseek-v4-flash:free";
+// ✅ DEFAULT MODEL
+const DEFAULT_MODEL =
+  "meta-llama/llama-3-8b-instruct:free";
 
 let client = null;
 
+// CLIENT
 const getClient = () => {
-    const key = process.env.OPENROUTER_API_KEY;
+  const key = process.env.OPENROUTER_API_KEY;
 
-    if (!key?.trim()) {
-        throw new Error("OPENROUTER_API_KEY missing in .env");
-    }
+  if (!key) {
+    throw new Error(
+      "OPENROUTER_API_KEY missing"
+    );
+  }
 
-    if (!client) {
-        client = new OpenAI({
-            apiKey: key,
-            baseURL: "https://openrouter.ai/api/v1",
-        });
-    }
+  if (!client) {
+    client = new OpenAI({
+      apiKey: key,
+      baseURL:
+        "https://openrouter.ai/api/v1",
+    });
+  }
 
-    return client;
+  return client;
 };
 
+// MODEL PICKER
 const getModelId = () =>
-    (process.env.OPENROUTER_MODEL || DEFAULT_MODEL).trim();
+  (
+    process.env.OPENROUTER_MODEL ||
+    DEFAULT_MODEL
+  ).trim();
 
-/**
- * ✅ SAFE JSON PARSER (IMPORTANT FIX)
- */
+// SAFE JSON PARSER
 const safeJSONParse = (text) => {
-    try {
-        return JSON.parse(text);
-    } catch {
-        const match = text.match(/\[[\s\S]*\]/);
-        if (match) {
-            try {
-                return JSON.parse(match[0]);
-            } catch {
-                return [];
-            }
-        }
+  try {
+    return JSON.parse(text);
+  } catch {
+    const match =
+      text.match(/\[[\s\S]*\]/);
+
+    if (match) {
+      try {
+        return JSON.parse(match[0]);
+      } catch {
         return [];
-    }
-};
-
-/**
- * Retry + call
- */
-const generateContentWithRetry = async (prompt, config = {}) => {
-    let lastError;
-
-    for (let attempt = 0; attempt < 2; attempt++) {
-        try {
-            const res = await getClient().chat.completions.create({
-                model: getModelId(),
-                messages: [{ role: "user", content: prompt }],
-                temperature: config.temperature ?? 0.4,
-                max_tokens: config.maxTokens ?? 4096,
-            });
-
-            return res.choices?.[0]?.message?.content || "";
-
-        } catch (err) {
-            lastError = err;
-
-            if ((err.status === 429 || err.status === 503) && attempt === 0) {
-                await new Promise(r => setTimeout(r, 1500));
-                continue;
-            }
-
-            throw err;
-        }
+      }
     }
 
-    throw lastError;
+    return [];
+  }
 };
 
-/**
- * FLASHCARDS (FIXED)
- */
-export const generateFlashcards = async (text, count = 10) => {
-    const safeText = text.substring(0, 15000);
-    const n = Math.min(Math.max(count, 1), 50);
+// RETRY + FALLBACK
+const generateContentWithRetry = async (
+  prompt,
+  config = {}
+) => {
+  const MODELS = [
+    getModelId(),
+    "openrouter/auto",
+  ];
 
-    const prompt = `Create exactly ${n} flashcards.
+  for (let model of MODELS) {
+    try {
+      const res =
+        await getClient().chat.completions.create(
+          {
+            model,
 
-STRICT RULES:
-- Return ONLY JSON array
-- No markdown
-- No explanation
-- Each object:
-{"question":"","answer":"","difficulty":"easy|medium|hard"}
+            messages: [
+              {
+                role: "user",
+                content: prompt,
+              },
+            ],
 
-Text:
-${safeText}`;
+            // 🔥 MORE CREATIVE
+            temperature:
+              config.temperature ?? 0.8,
 
-    const output = await generateContentWithRetry(prompt);
+            max_tokens:
+              config.maxTokens ?? 2500,
+          }
+        );
 
-    const data = safeJSONParse(output);
+      return (
+        res?.choices?.[0]?.message
+          ?.content || ""
+      );
+    } catch (err) {
+      console.error(
+        "Model failed:",
+        model,
+        err?.status
+      );
 
-    if (!Array.isArray(data)) return [];
+      // payment issue
+      if (err.status === 402) {
+        continue;
+      }
 
-    return data;
-};
+      // rate limit
+      if (
+        err.status === 429 ||
+        err.status === 503
+      ) {
+        await new Promise((r) =>
+          setTimeout(r, 1500)
+        );
 
-/**
- * QUIZ (SUPER ROBUST FIX)
- */
-export const generateQuiz = async (text, numQuestions = 5) => {
-    const safeText = text.substring(0, 15000);
-    const n = Math.min(Math.max(numQuestions, 1), 20);
-
-    const prompt = `Generate exactly ${n} MCQs.
-
-STRICT FORMAT:
-
-Q: ...
-01: ...
-02: ...
-03: ...
-04: ...
-C: ...
-E: ...
-D: easy|medium|hard
-
-NO EXTRA TEXT
-Separate with ---`;
-
-    const output = await generateContentWithRetry(prompt);
-
-    const questions = [];
-    const blocks = output.split("---").filter(Boolean);
-
-    for (const block of blocks) {
-        const lines = block.split("\n");
-
-        let q = "", opts = [], correct = "", exp = "", diff = "medium";
-
-        for (let line of lines) {
-            line = line.trim();
-
-            if (line.startsWith("Q:")) q = line.slice(2).trim();
-            else if (/^0[1-4]:/.test(line)) opts.push(line.slice(3).trim());
-            else if (line.startsWith("C:")) correct = line.slice(2).trim();
-            else if (line.startsWith("E:")) exp = line.slice(2).trim();
-            else if (line.startsWith("D:")) diff = line.slice(2).trim();
-        }
-
-        // ✅ HARD VALIDATION
-        if (q && opts.length === 4 && correct) {
-            questions.push({
-                question: q,
-                options: opts,
-                correctAnswer: correct,
-                explanation: exp || "",
-                difficulty: diff || "medium",
-            });
-        }
+        continue;
+      }
     }
+  }
 
-    return questions.slice(0, n);
+  return "⚠️ AI service is temporarily unavailable.";
 };
 
-/**
- * SUMMARY
- */
-export const generateSummary = async (text) => {
-    const prompt = `Summarize clearly:
+// CHAT WITH CONTEXT
+export const chatWithContext = async (
+  question,
+  chunks = []
+) => {
+  const context = chunks
+    .map(
+      (c, i) =>
+        `[${i + 1}] ${c.content}`
+    )
+    .join("\n");
 
-${text.substring(0, 20000)}`;
+  const prompt = `
+Answer ONLY using the provided context.
 
-    return await generateContentWithRetry(prompt, { temperature: 0.5 });
-};
-
-/**
- * CHAT
- */
-export const chatWithContext = async (question, chunks) => {
-    const context = chunks.map((c, i) => `[${i + 1}] ${c.content}`).join("\n");
-
-    const prompt = `Context:
+Context:
 ${context}
 
 Question:
-${question}`;
+${question}
 
-    return await generateContentWithRetry(prompt);
+Answer clearly and accurately.
+`;
+
+  const output =
+    await generateContentWithRetry(prompt);
+
+  return (
+    output || "No answer generated."
+  );
 };
 
-/**
- * EXPLAIN
- */
-export const explainConcept = async (concept, context) => {
-    const prompt = `Explain "${concept}" simply with examples:
+// SUMMARY
+export const generateSummary =
+  async (text) => {
+    return await generateContentWithRetry(
+      `
+Summarize the following content clearly and concisely:
 
-${context}`;
+${text.substring(0, 15000)}
+`
+    );
+  };
 
-    return await generateContentWithRetry(prompt);
+// EXPLAIN CONCEPT
+export const explainConcept =
+  async (concept, context) => {
+    return await generateContentWithRetry(
+      `
+Explain the concept "${concept}" in simple words with examples.
+
+Context:
+${context}
+`
+    );
+  };
+
+// FLASHCARDS
+export const generateFlashcards =
+  async (text) => {
+    // randomize content
+    const words = text.split(" ");
+
+    const randomStart = Math.floor(
+      Math.random() *
+        Math.max(
+          1,
+          words.length - 12000
+        )
+    );
+
+    const randomText = words
+      .slice(randomStart, randomStart + 12000)
+      .join(" ");
+
+    const prompt = `
+Create EXACTLY 10 UNIQUE flashcards.
+
+Rules:
+- Return ONLY a valid JSON array
+- No repeated questions
+- Keep answers concise
+- Questions should cover different concepts
+
+Format:
+[
+  {
+    "question": "...",
+    "answer": "..."
+  }
+]
+
+Text:
+${randomText}
+`;
+
+    const output =
+      await generateContentWithRetry(
+        prompt,
+        {
+          temperature: 0.9,
+          maxTokens: 2000,
+        }
+      );
+
+    console.log(
+      "RAW FLASHCARD RESPONSE:"
+    );
+
+    console.log(output);
+
+    const parsed =
+      safeJSONParse(output);
+
+    return parsed
+      .slice(0, 10)
+      .map((card) => ({
+        question:
+          card.question || "",
+
+        answer: card.answer || "",
+      }));
+  };
+
+// QUIZ GENERATOR
+export const generateQuiz = async (
+  text,
+  numQuestions = 5
+) => {
+  // 🔥 RANDOMIZE CONTENT
+  const words = text.split(" ");
+
+  const randomStart = Math.floor(
+    Math.random() *
+      Math.max(
+        1,
+        words.length - 12000
+      )
+  );
+
+  const randomText = words
+    .slice(randomStart, randomStart + 12000)
+    .join(" ");
+
+  const prompt = `
+Create EXACTLY ${numQuestions} UNIQUE multiple choice questions.
+
+Rules:
+- Return ONLY a valid JSON array
+- Questions must NOT repeat
+- Make questions varied and intelligent
+- Include conceptual, factual, and analytical questions
+- Avoid similar wording
+- Use different difficulty levels
+
+Each question MUST contain:
+
+{
+  "question": "...",
+  "options": [
+    "Option A",
+    "Option B",
+    "Option C",
+    "Option D"
+  ],
+  "correctAnswer": "FULL OPTION TEXT",
+  "explanation": "Short explanation"
+}
+
+IMPORTANT:
+- correctAnswer MUST be FULL option text
+- NEVER use A/B/C/D
+- explanation should be concise
+- Questions MUST come from the provided text
+- Options should look realistic
+
+Text:
+${randomText}
+`;
+
+  const output =
+    await generateContentWithRetry(
+      prompt,
+      {
+        temperature: 0.95,
+        maxTokens: 3000,
+      }
+    );
+
+  console.log(
+    "RAW QUIZ AI RESPONSE:"
+  );
+
+  console.log(output);
+
+  const parsed =
+    safeJSONParse(output);
+
+  return parsed
+    .slice(0, numQuestions)
+    .map((q) => ({
+      question:
+        q.question || "",
+
+      options:
+        Array.isArray(q.options) &&
+        q.options.length === 4
+          ? q.options
+          : [],
+
+      correctAnswer:
+        q.correctAnswer || "",
+
+      explanation:
+        q.explanation ||
+        `The correct answer is: ${q.correctAnswer}`,
+    }));
 };

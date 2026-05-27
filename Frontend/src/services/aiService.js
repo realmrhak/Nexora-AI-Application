@@ -1,57 +1,84 @@
 import axiosInstance from '../utils/axiosInstance';
 import { API_PATHS } from '../utils/apiPaths';
 
-const generateFlashcards = async (documentId, options) => {
+// FLASHCARDS
+const generateFlashcards = async (documentId, options = {}) => {
     try {
-        const response = await axiosInstance.post(API_PATHS.AI.GENERATE_FLASHCARDS, { documentId, ...options });
+        const response = await axiosInstance.post(
+            API_PATHS.AI.GENERATE_FLASHCARDS,
+            { documentId, ...options }
+        );
         return response.data;
     } catch (error) {
         throw error.response?.data || { message: 'Failed to generate flashcards' };
     }
 };
 
-const generateQuiz = async (documentId, options) => {
+// QUIZ
+const generateQuiz = async (documentId, options = {}) => {
     try {
-        const response = await axiosInstance.post(API_PATHS.AI.GENERATE_QUIZ, { documentId, ...options });
+        const response = await axiosInstance.post(
+            API_PATHS.AI.GENERATE_QUIZ,
+            { documentId, ...options }
+        );
         return response.data;
     } catch (error) {
         throw error.response?.data || { message: 'Failed to generate quiz' };
     }
 };
 
+// SUMMARY
 const generateSummary = async (documentId) => {
     try {
-        const response = await axiosInstance.post(API_PATHS.AI.GENERATE_SUMMARY, { documentId });
+        const response = await axiosInstance.post(
+            API_PATHS.AI.GENERATE_SUMMARY,
+            { documentId }
+        );
         return response.data?.data;
     } catch (error) {
         throw error.response?.data || { message: 'Failed to generate summary' };
-    };
+    }
 };
 
+// ✅ CHAT (FIXED)
 const chat = async (documentId, message) => {
     try {
-        const response = await axiosInstance.post(API_PATHS.AI.CHAT, { documentId, question: message }); // Removed history from payload return response.data;
+        const response = await axiosInstance.post(
+            API_PATHS.AI.CHAT,
+            { documentId, question: message }
+        );
+
+        return response.data; // ✅ IMPORTANT FIX
     } catch (error) {
         throw error.response?.data || { message: 'Chat request failed' };
     }
 };
-Q
+
+// EXPLAIN
 const explainConcept = async (documentId, concept) => {
-try {
-    
-    const response = await axiosInstance.post(API_PATHS.AI.EXPLAIN_CONCEPT, { documentId, concept }); 
-    return response.data?.data;
+    try {
+        const response = await axiosInstance.post(
+            API_PATHS.AI.EXPLAIN_CONCEPT,
+            { documentId, concept }
+        );
+        return response.data?.data;
     } catch (error) {
         throw error.response?.data || { message: 'Failed to explain concept' };
     }
 };
-    const getChatHistory = async (documentId) => {
+
+// CHAT HISTORY
+const getChatHistory = async (documentId) => {
     try {
-        const response = await axiosInstance.get(API_PATHS.AI.GET_CHAT_HISTORY(documentId)); return response.data;
+        const response = await axiosInstance.get(
+            API_PATHS.AI.GET_CHAT_HISTORY(documentId)
+        );
+        return response.data;
     } catch (error) {
-        throw error.response?.data || { message: 'Failed to fetch chat history'};
+        throw error.response?.data || { message: 'Failed to fetch chat history' };
     }
 };
+
 const aiService = {
     generateFlashcards,
     generateQuiz,
@@ -59,6 +86,6 @@ const aiService = {
     chat,
     explainConcept,
     getChatHistory
-}
+};
 
 export default aiService;

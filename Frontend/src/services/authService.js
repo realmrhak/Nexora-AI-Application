@@ -30,7 +30,16 @@ const login = async (email, password) => {
     if (!response.data?.token || !response.data?.user) {
       throw new Error("Invalid server response");
     }
-
+    
+    // ✅ SAVE TOKEN
+    localStorage.setItem("token", response.data.token);
+    
+    // ✅ SAVE USER
+    localStorage.setItem(
+      "user",
+      JSON.stringify(response.data.user)
+    );
+    
     return response.data;
   } catch (error) {
     console.log("❌ Login error:", error.response?.data || error.message);

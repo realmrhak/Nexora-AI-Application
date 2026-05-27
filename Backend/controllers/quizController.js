@@ -76,7 +76,6 @@ export const submitQuiz = async (req, res, next) => {
             });
         }
 
-
         if (quiz.completedAt) {
             return res.status(400).json({
                 success: false,
@@ -84,7 +83,7 @@ export const submitQuiz = async (req, res, next) => {
                 statusCode: 400
             });
         }
-        // Process answers
+
         let correctCount = 0;
         const userAnswers = [];
 
@@ -93,11 +92,44 @@ export const submitQuiz = async (req, res, next) => {
 
             if (questionIndex < quiz.questions.length) {
                 const question = quiz.questions[questionIndex];
-                const isCorrect = selectedAnswer === question.correctAnswer;
 
+                // Handle A/B/C/D style correct answers
+                let actualCorrectAnswer = question.correctAnswer;
 
+                if (
+                    ['A', 'B', 'C', 'D'].includes(
+                        String(question.correctAnswer).toUpperCase()
+                    )
+                ) {
+                    const answerIndex =
+                        String(question.correctAnswer)
+                            .toUpperCase()
+                            .charCodeAt(0) - 65;
 
-                if (isCorrect) correctCount++;
+                    actualCorrectAnswer =
+                        question.options[answerIndex];
+                }
+
+                const normalizedSelected = String(selectedAnswer || '')
+                    .trim()
+                    .toLowerCase();
+
+                const normalizedCorrect = String(actualCorrectAnswer || '')
+                    .trim()
+                    .toLowerCase();
+
+                const isCorrect =
+                    normalizedSelected === normalizedCorrect;
+
+                console.log('--------------------');
+                console.log('Question:', question.question);
+                console.log('Selected:', selectedAnswer);
+                console.log('Correct:', actualCorrectAnswer);
+                console.log('Match:', isCorrect);
+
+                if (isCorrect) {
+                    correctCount++;
+                }
 
                 userAnswers.push({
                     questionIndex,
@@ -109,7 +141,9 @@ export const submitQuiz = async (req, res, next) => {
         });
 
         // Calculate score
-        const score = Math.round((correctCount / quiz.totalQuestions) * 100);
+        const score = Math.round(
+            (correctCount / quiz.totalQuestions) * 100
+        );
 
         // Update quiz
         quiz.userAnswers = userAnswers;
@@ -132,9 +166,10 @@ export const submitQuiz = async (req, res, next) => {
         });
 
     } catch (error) {
+        console.error('SUBMIT QUIZ ERROR:', error);
         next(error);
     }
-}
+};
 
 
 // @desc      Get quiz results
@@ -168,15 +203,43 @@ export const getQuizResults = async (req, res, next) => {
             const userAnswer = quiz.userAnswers.find(
                 a => a.questionIndex === index
             );
-
+        
+            // FIX correct answer
+            let actualCorrectAnswer = question.correctAnswer;
+        
+            // Convert A/B/C/D to real option
+            if (
+                ['A', 'B', 'C', 'D'].includes(
+                    String(question.correctAnswer).toUpperCase()
+                )
+            ) {
+                const answerIndex =
+                    String(question.correctAnswer)
+                        .toUpperCase()
+                        .charCodeAt(0) - 65;
+        
+                actualCorrectAnswer =
+                    question.options[answerIndex];
+            }
+        
             return {
                 questionIndex: index,
                 question: question.question,
                 options: question.options,
-                correctAnswer: question.correctAnswer,
-                selectedAnswer: userAnswer?.selectedAnswer || null,
-                isCorrect: userAnswer?.isCorrect || false,
-                explanation: question.explanation
+        
+                // FIXED
+                correctAnswer: actualCorrectAnswer,
+        
+                selectedAnswer:
+                    userAnswer?.selectedAnswer || null,
+        
+                isCorrect:
+                    userAnswer?.isCorrect || false,
+        
+                // FIX explanation
+                explanation:
+                    question.explanation ||
+                    'No explanation available'
             };
         });
 
