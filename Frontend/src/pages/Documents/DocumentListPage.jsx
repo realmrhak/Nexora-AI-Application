@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Upload, Trash2, FileText, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -41,12 +41,33 @@ const DocumentListPage = () => {
     }, []);
 
     const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setUploadFile(file);
-            setUploadTitle(file.name.replace(/\.[^/.]+$/, ""));
-        }
-    };
+
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    // Only PDF allowed
+    if (file.type !== "application/pdf") {
+
+        toast.error("Only PDF files are allowed");
+
+        return;
+    }
+
+    // 10MB limit
+    if (file.size > 10 * 1024 * 1024) {
+
+        toast.error("Please upload PDF under 10MB");
+
+        return;
+    }
+
+    setUploadFile(file);
+
+    setUploadTitle(
+        file.name.replace(/\.[^/.]+$/, "")
+    );
+};
     const handleUpload = async (e) => {
         e.preventDefault();
         if (!uploadFile || !uploadTitle) {

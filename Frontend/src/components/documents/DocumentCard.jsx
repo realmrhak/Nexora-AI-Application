@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, Trash2, BookOpen, BrainCircuit, Clock } from 'lucide-react';
 import moment from 'moment';
