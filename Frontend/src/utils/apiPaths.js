@@ -1,4 +1,4 @@
-export const BASE_URL = "http://localhost:8000";
+export const BASE_URL = "https://nexora-ai-application.onrender.com";
 
 export const API_PATHS = {
     AUTH: {
