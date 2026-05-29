@@ -1,7 +1,8 @@
-import pkg from "pdf-parse";
 import axios from "axios";
+import { createRequire } from "module";
 
-const pdf = pkg;
+const require = createRequire(import.meta.url);
+const pdf = require("pdf-parse");
 
 /**
  * Extract text from PDF URL (Cloudinary / remote)
@@ -14,7 +15,7 @@ export const extractTextFromPDF = async (fileUrl) => {
       throw new Error("No file URL provided");
     }
 
-    // Fetch PDF from Cloudinary / remote URL
+    // Fetch PDF from URL
     const response = await axios.get(fileUrl, {
       responseType: "arraybuffer",
       timeout: 120000,
