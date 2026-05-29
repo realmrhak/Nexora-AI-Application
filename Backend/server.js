@@ -30,18 +30,26 @@ connectDB();
 
 // Browsers reject origin: "*" together with credentials: true
 const clientUrl = process.env.CLIENT_URL;
-app.use(
+const allowedOrigins = [
+    "http://localhost:5173",
+    process.env.CLIENT_URL,
+  ];
+  
+  app.use(
     cors({
-        origin: [
-            "http://localhost:5173",
-            process.env.CLIENT_URL,
-            console.log("CLIENT_URL:", process.env.CLIENT_URL)
-        ],
-        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-        allowedHeaders: ["Content-Type", "Authorization"],
-        credentials: true,
+      origin: function (origin, callback) {
+        // allow requests with no origin (mobile apps/postman)
+        if (!origin) return callback(null, true);
+  
+        if (allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
+      credentials: true,
     })
-);
+  );
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
