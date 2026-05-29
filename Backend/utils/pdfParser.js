@@ -1,55 +1,54 @@
 import axios from "axios";
-import { createRequire } from "module";
-
-const require = createRequire(import.meta.url);
-const pdf = require("pdf-parse");
+import pdf from "pdf-parse";
 
 /**
  * Extract text from PDF URL (Cloudinary / remote)
  */
 export const extractTextFromPDF = async (fileUrl) => {
-  let dataBuffer;
-
   try {
     if (!fileUrl) {
       throw new Error("No file URL provided");
     }
 
-    // Fetch PDF from URL
-    const response = await axios.get(fileUrl, {
-      responseType: "arraybuffer",
-      timeout: 120000,
-    });
+    console.log("📥 Downloading PDF:", fileUrl);
 
-    if (!response.data) {
-      throw new Error("Failed to download PDF file");
+    // ✅ safer fetch (works better on Render than axios sometimes)
+    const response = await fetch(fileUrl);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch PDF file. Status: ${response.status}`);
     }
 
-    dataBuffer = Buffer.from(response.data);
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
-    // Parse PDF
-    const data = await pdf(dataBuffer);
+    // 🚨 safety check
+    if (!buffer || buffer.length === 0) {
+      throw new Error("Empty PDF buffer received");
+    }
 
-    const text = (data.text || "").trim();
+    // 📄 parse PDF
+    const data = await pdf(buffer);
+
+    const text = (data.text || "").replace(/\s+/g, " ").trim();
 
     if (!text) {
-      throw new Error(
-        "No extractable text found (PDF may be scanned image)"
-      );
+      throw new Error("No extractable text (maybe scanned PDF image)");
     }
+
+    console.log("✅ PDF extracted successfully");
 
     return {
       text,
       numPages: data.numpages || 0,
       info: data.info || {},
     };
+
   } catch (error) {
     console.error("========== PDF PARSING ERROR ==========");
     console.error("URL:", fileUrl);
-    console.error(error.message);
+    console.error("ERROR:", error.message);
 
-    throw new Error(
-      error?.message || "Failed to extract text from PDF"
-    );
+    throw new Error("Failed to extract text from PDF");
   }
 };

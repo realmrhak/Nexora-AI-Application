@@ -29,8 +29,7 @@ export const uploadDocument = async (req, res, next) => {
         }
 
         // ✅ Cloudinary URL (SAFE fallback included)
-        const fileUrl =
-            req.file.path || req.file.secure_url;
+        const fileUrl = req.file.path;
 
         console.log("📄 Uploaded file:", req.file);
         console.log("🌐 File URL used:", fileUrl);
