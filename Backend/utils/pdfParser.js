@@ -1,60 +1,52 @@
-import { PDFParse } from "pdf-parse";
+import pdf from "pdf-parse";
+import axios from "axios";
 
 /**
- * Extract text from PDF URL
- * @param {string} fileUrl
- * @returns {Promise<{text: string, numPages: number, info: object}>}
+ * Extract text from PDF URL (Cloudinary / remote)
  */
-
 export const extractTextFromPDF = async (fileUrl) => {
+  let dataBuffer;
 
-    let parser;
-
-    try {
-
-        // Fetch PDF from Cloudinary URL
-        const response = await fetch(fileUrl);
-
-        if (!response.ok) {
-            throw new Error("Failed to fetch PDF file");
-        }
-
-        // Convert response to ArrayBuffer
-        const arrayBuffer = await response.arrayBuffer();
-
-        // Convert to Buffer
-        const dataBuffer = Buffer.from(arrayBuffer);
-
-        // Parse PDF
-        parser = new PDFParse({ data: dataBuffer });
-
-        const textResult = await parser.getText();
-
-        const text = (textResult.text ?? "").trim();
-
-        const numPages = textResult.total ?? 0;
-
-        return {
-            text,
-            numPages,
-            info: {},
-        };
-
-    } catch (error) {
-
-        console.error("========== PDF PARSING ERROR ==========");
-        console.error(error);
-
-        throw new Error(
-            error instanceof Error
-                ? error.message
-                : "Failed to extract text from PDF"
-        );
-
-    } finally {
-
-        if (parser) {
-            await parser.destroy().catch(() => {});
-        }
+  try {
+    if (!fileUrl) {
+      throw new Error("No file URL provided");
     }
+
+    // FETCH PDF (SAFE FOR CLOUD + RENDER)
+    const response = await axios.get(fileUrl, {
+      responseType: "arraybuffer",
+      timeout: 120000, // 2 min timeout
+    });
+
+    if (!response.data) {
+      throw new Error("Failed to download PDF file");
+    }
+
+    dataBuffer = Buffer.from(response.data);
+
+    // PARSE PDF (CORRECT WAY)
+    const data = await pdf(dataBuffer);
+
+    const text = (data.text || "").trim();
+
+    if (!text) {
+      throw new Error(
+        "No extractable text found (PDF may be scanned image)"
+      );
+    }
+
+    return {
+      text,
+      numPages: data.numpages || 0,
+      info: data.info || {},
+    };
+  } catch (error) {
+    console.error("========== PDF PARSING ERROR ==========");
+    console.error("URL:", fileUrl);
+    console.error(error.message);
+
+    throw new Error(
+      error?.message || "Failed to extract text from PDF"
+    );
+  }
 };
