@@ -10,12 +10,11 @@ import mongoose from 'mongoose';
 // @access  Private
 export const uploadDocument = async (req, res, next) => {
     try {
-
         if (!req.file) {
             return res.status(400).json({
                 success: false,
-                error: 'Please upload a PDF file',
-                statusCode: 400
+                error: "Please upload a PDF file",
+                statusCode: 400,
             });
         }
 
@@ -24,14 +23,25 @@ export const uploadDocument = async (req, res, next) => {
         if (!title) {
             return res.status(400).json({
                 success: false,
-                error: 'Please provide a document title',
-                statusCode: 400
+                error: "Please provide a document title",
+                statusCode: 400,
             });
         }
 
-        // Cloudinary URL
-        const fileUrl = req.file.secure_url;
-        console.log(req.file);
+        // ✅ Cloudinary URL (SAFE fallback included)
+        const fileUrl =
+            req.file.path || req.file.secure_url;
+
+        console.log("📄 Uploaded file:", req.file);
+        console.log("🌐 File URL used:", fileUrl);
+
+        if (!fileUrl) {
+            return res.status(500).json({
+                success: false,
+                error: "Cloudinary upload failed (file URL missing)",
+                statusCode: 500,
+            });
+        }
 
         // Create document record
         const document = await Document.create({
@@ -40,21 +50,22 @@ export const uploadDocument = async (req, res, next) => {
             fileName: req.file.originalname,
             filePath: fileUrl,
             fileSize: req.file.size,
-            status: 'processing'
+            status: "processing",
         });
 
-        // Process PDF
-        processPDF(document._id, fileUrl).catch(err => {
-            console.error('PDF processing error:', err);
+        // Process PDF (async)
+        processPDF(document._id, fileUrl).catch((err) => {
+            console.error("PDF processing error:", err);
         });
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
             data: document,
-            message: 'Document uploaded successfully. Processing in progress...'
+            message: "Document uploaded successfully. Processing in progress...",
         });
 
     } catch (error) {
+        console.error("UPLOAD ERROR:", error);
         next(error);
     }
 };
