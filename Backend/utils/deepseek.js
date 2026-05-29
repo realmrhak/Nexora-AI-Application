@@ -92,33 +92,28 @@ const generateContentWithRetry = async (
         return output;
       }
     } catch (err) {
-      console.error("=================================");
-      console.error("MODEL FAILED:", model);
 
-      console.error(
-        err?.response?.data ||
-          err?.message ||
-          err
+      console.log("============== OPENROUTER ERROR ==============");
+
+      console.log("MODEL:", model);
+
+      console.log("STATUS:", err?.status);
+
+      console.log("MESSAGE:", err?.message);
+
+      console.log(
+        "FULL ERROR:",
+        JSON.stringify(err, null, 2)
       );
 
-      console.error("=================================");
+      console.log("==============================================");
 
-      // payment issue
-      if (err?.status === 402) {
-        continue;
-      }
+      // small delay before next model
+      await new Promise((r) =>
+        setTimeout(r, 2000)
+      );
 
-      // rate limit / provider busy
-      if (
-        err?.status === 429 ||
-        err?.status === 503
-      ) {
-        await new Promise((r) =>
-          setTimeout(r, 2000)
-        );
-
-        continue;
-      }
+      continue;
     }
   }
 
@@ -182,6 +177,7 @@ ${context}
 // FLASHCARDS
 export const generateFlashcards =
   async (text, count = 10) => {
+
     const words = text.split(" ");
 
     const randomStart = Math.floor(
@@ -238,6 +234,7 @@ export const generateQuiz = async (
   text,
   numQuestions = 5
 ) => {
+
   const words = text.split(" ");
 
   const randomStart = Math.floor(
