@@ -1,26 +1,23 @@
 import OpenAI from "openai";
 
-// ✅ DEFAULT MODEL
+// DEFAULT MODEL
 const DEFAULT_MODEL =
-  "meta-llama/llama-3-8b-instruct:free";
+  "mistralai/mistral-7b-instruct:free";
 
 let client = null;
 
-// CLIENT
+// OPENROUTER CLIENT
 const getClient = () => {
   const key = process.env.OPENROUTER_API_KEY;
 
   if (!key) {
-    throw new Error(
-      "OPENROUTER_API_KEY missing"
-    );
+    throw new Error("OPENROUTER_API_KEY missing");
   }
 
   if (!client) {
     client = new OpenAI({
       apiKey: key,
-      baseURL:
-        "https://openrouter.ai/api/v1",
+      baseURL: "https://openrouter.ai/api/v1",
     });
   }
 
@@ -39,8 +36,7 @@ const safeJSONParse = (text) => {
   try {
     return JSON.parse(text);
   } catch {
-    const match =
-      text.match(/\[[\s\S]*\]/);
+    const match = text.match(/\[[\s\S]*\]/);
 
     if (match) {
       try {
@@ -61,55 +57,64 @@ const generateContentWithRetry = async (
 ) => {
   const MODELS = [
     getModelId(),
+    "mistralai/mistral-7b-instruct:free",
+    "google/gemma-2-9b-it:free",
     "openrouter/auto",
   ];
 
   for (let model of MODELS) {
     try {
+      console.log(`Trying model: ${model}`);
+
       const res =
-        await getClient().chat.completions.create(
-          {
-            model,
+        await getClient().chat.completions.create({
+          model,
 
-            messages: [
-              {
-                role: "user",
-                content: prompt,
-              },
-            ],
+          messages: [
+            {
+              role: "user",
+              content: prompt,
+            },
+          ],
 
-            // 🔥 MORE CREATIVE
-            temperature:
-              config.temperature ?? 0.8,
+          temperature:
+            config.temperature ?? 0.7,
 
-            max_tokens:
-              config.maxTokens ?? 2500,
-          }
-        );
+          max_tokens:
+            config.maxTokens ?? 2500,
+        });
 
-      return (
-        res?.choices?.[0]?.message
-          ?.content || ""
-      );
+      const output =
+        res?.choices?.[0]?.message?.content;
+
+      if (output) {
+        console.log(`SUCCESS MODEL: ${model}`);
+        return output;
+      }
     } catch (err) {
+      console.error("=================================");
+      console.error("MODEL FAILED:", model);
+
       console.error(
-        "Model failed:",
-        model,
-        err?.status
+        err?.response?.data ||
+          err?.message ||
+          err
       );
+
+      console.error("=================================");
 
       // payment issue
-      if (err.status === 402) {
+      if (err?.status === 402) {
         continue;
       }
 
-      // rate limit
+      // rate limit / provider busy
       if (
-        err.status === 429 ||
-        err.status === 503
+        err?.status === 429 ||
+        err?.status === 503
       ) {
         await new Promise((r) =>
-          setTimeout(r, 1500)
+          setTimeout(r, 2000)
         );
 
         continue;
@@ -117,7 +122,9 @@ const generateContentWithRetry = async (
     }
   }
 
-  return "⚠️ AI service is temporarily unavailable.";
+  throw new Error(
+    "AI service is temporarily unavailable."
+  );
 };
 
 // CHAT WITH CONTEXT
@@ -126,10 +133,7 @@ export const chatWithContext = async (
   chunks = []
 ) => {
   const context = chunks
-    .map(
-      (c, i) =>
-        `[${i + 1}] ${c.content}`
-    )
+    .map((c, i) => `[${i + 1}] ${c.content}`)
     .join("\n");
 
   const prompt = `
@@ -147,9 +151,7 @@ Answer clearly and accurately.
   const output =
     await generateContentWithRetry(prompt);
 
-  return (
-    output || "No answer generated."
-  );
+  return output || "No answer generated.";
 };
 
 // SUMMARY
@@ -179,16 +181,12 @@ ${context}
 
 // FLASHCARDS
 export const generateFlashcards =
-  async (text) => {
-    // randomize content
+  async (text, count = 10) => {
     const words = text.split(" ");
 
     const randomStart = Math.floor(
       Math.random() *
-        Math.max(
-          1,
-          words.length - 12000
-        )
+        Math.max(1, words.length - 12000)
     );
 
     const randomText = words
@@ -196,7 +194,7 @@ export const generateFlashcards =
       .join(" ");
 
     const prompt = `
-Create EXACTLY 10 UNIQUE flashcards.
+Create EXACTLY ${count} UNIQUE flashcards.
 
 Rules:
 - Return ONLY a valid JSON array
@@ -217,29 +215,20 @@ ${randomText}
 `;
 
     const output =
-      await generateContentWithRetry(
-        prompt,
-        {
-          temperature: 0.9,
-          maxTokens: 2000,
-        }
-      );
+      await generateContentWithRetry(prompt, {
+        temperature: 0.9,
+        maxTokens: 2000,
+      });
 
-    console.log(
-      "RAW FLASHCARD RESPONSE:"
-    );
-
+    console.log("RAW FLASHCARD RESPONSE:");
     console.log(output);
 
-    const parsed =
-      safeJSONParse(output);
+    const parsed = safeJSONParse(output);
 
     return parsed
-      .slice(0, 10)
+      .slice(0, count)
       .map((card) => ({
-        question:
-          card.question || "",
-
+        question: card.question || "",
         answer: card.answer || "",
       }));
   };
@@ -249,15 +238,11 @@ export const generateQuiz = async (
   text,
   numQuestions = 5
 ) => {
-  // 🔥 RANDOMIZE CONTENT
   const words = text.split(" ");
 
   const randomStart = Math.floor(
     Math.random() *
-      Math.max(
-        1,
-        words.length - 12000
-      )
+      Math.max(1, words.length - 12000)
   );
 
   const randomText = words
@@ -270,10 +255,7 @@ Create EXACTLY ${numQuestions} UNIQUE multiple choice questions.
 Rules:
 - Return ONLY a valid JSON array
 - Questions must NOT repeat
-- Make questions varied and intelligent
-- Include conceptual, factual, and analytical questions
-- Avoid similar wording
-- Use different difficulty levels
+- Include conceptual and factual questions
 
 Each question MUST contain:
 
@@ -292,37 +274,26 @@ Each question MUST contain:
 IMPORTANT:
 - correctAnswer MUST be FULL option text
 - NEVER use A/B/C/D
-- explanation should be concise
-- Questions MUST come from the provided text
-- Options should look realistic
 
 Text:
 ${randomText}
 `;
 
   const output =
-    await generateContentWithRetry(
-      prompt,
-      {
-        temperature: 0.95,
-        maxTokens: 3000,
-      }
-    );
+    await generateContentWithRetry(prompt, {
+      temperature: 0.8,
+      maxTokens: 3000,
+    });
 
-  console.log(
-    "RAW QUIZ AI RESPONSE:"
-  );
-
+  console.log("RAW QUIZ RESPONSE:");
   console.log(output);
 
-  const parsed =
-    safeJSONParse(output);
+  const parsed = safeJSONParse(output);
 
   return parsed
     .slice(0, numQuestions)
     .map((q) => ({
-      question:
-        q.question || "",
+      question: q.question || "",
 
       options:
         Array.isArray(q.options) &&
@@ -335,6 +306,6 @@ ${randomText}
 
       explanation:
         q.explanation ||
-        `The correct answer is: ${q.correctAnswer}`,
+        `Correct answer: ${q.correctAnswer}`,
     }));
 };
