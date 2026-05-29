@@ -1,5 +1,7 @@
-import pdf from "pdf-parse";
+import pkg from "pdf-parse";
 import axios from "axios";
+
+const pdf = pkg;
 
 /**
  * Extract text from PDF URL (Cloudinary / remote)
@@ -12,10 +14,10 @@ export const extractTextFromPDF = async (fileUrl) => {
       throw new Error("No file URL provided");
     }
 
-    // FETCH PDF (SAFE FOR CLOUD + RENDER)
+    // Fetch PDF from Cloudinary / remote URL
     const response = await axios.get(fileUrl, {
       responseType: "arraybuffer",
-      timeout: 120000, // 2 min timeout
+      timeout: 120000,
     });
 
     if (!response.data) {
@@ -24,7 +26,7 @@ export const extractTextFromPDF = async (fileUrl) => {
 
     dataBuffer = Buffer.from(response.data);
 
-    // PARSE PDF (CORRECT WAY)
+    // Parse PDF
     const data = await pdf(dataBuffer);
 
     const text = (data.text || "").trim();
