@@ -4,11 +4,12 @@ import cloudinary from "./cloudinary.js";
 
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: {
+  params: async (req, file) => ({
     folder: "ai-learning-assistant",
     resource_type: "raw",
-    format: async () => "pdf",
-  },
+    public_id: `${Date.now()}-${file.originalname}`,
+    format: "pdf",
+  }),
 });
 
 const upload = multer({

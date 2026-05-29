@@ -169,7 +169,7 @@ export const generateQuiz = async (req, res, next) => {
             userId: req.user._id,
             documentId: document._id,
             title: title || `${document.title} - Quiz`,
-            questions: questions.map(q => {
+            questions: safeQuestions.map(q => {
                 let difficulty = "medium";
 
                 if (q.difficulty) {

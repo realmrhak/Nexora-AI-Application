@@ -30,7 +30,8 @@ export const uploadDocument = async (req, res, next) => {
         }
 
         // Cloudinary URL
-        const fileUrl = req.file.path;
+        const fileUrl = req.file.secure_url;
+        console.log(req.file);
 
         // Create document record
         const document = await Document.create({
