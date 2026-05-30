@@ -125,10 +125,12 @@ const DocumentListPage = () => {
         }
 
         if (documents.length === 0) {
-            return (
+             // In the empty state return (documents.length === 0): 
+             return (
                 <div className='flex items-center justify-center min-h-[400px]'>
-                    <div className='text-center max-w-md'>
-                        <div className='shrink-0 w-12 h-12 bg-linear-to-br from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25 group-hover:scale-110 transition-transform duration-300'>
+                    <div className='text-center max-w-md flex flex-col items-center'>
+                        {/* ✅ FIXED: Added flex centering */}
+                        <div className='shrink-0 w-12 h-12 bg-linear-to-br from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25 mb-4'>
                             <FileText className='w-6 h-6 text-white' strokeWidth={2} />
                         </div>
                         <h3 className="text-xl font-medium text-slate-900 tracking-tight mb-2">

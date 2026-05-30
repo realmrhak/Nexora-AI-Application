@@ -7,8 +7,8 @@ const Header = ({ toggleSidebar }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const [open, setOpen] = useState(false); // notifications
-  const [userOpen, setUserOpen] = useState(false); // profile dropdown
+  const [open, setOpen] = useState(false);
+  const [userOpen, setUserOpen] = useState(false);
 
   const notifRef = useRef(null);
   const userRef = useRef(null);
@@ -37,7 +37,6 @@ const Header = ({ toggleSidebar }) => {
     },
   ]);
 
-  // ✅ SINGLE clean outside click handler
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (notifRef.current && !notifRef.current.contains(event.target)) {
@@ -66,7 +65,7 @@ const Header = ({ toggleSidebar }) => {
 
   return (
     <header className="sticky top-0 z-40 w-full h-16 bg-white/70 backdrop-blur-2xl border-b border-slate-200/50">
-      <div className="flex items-center justify-between h-full px-6">
+      <div className="flex items-center justify-between h-full px-4 sm:px-6">
         {/* LEFT */}
         <div className="flex items-center gap-3">
           <button
@@ -78,8 +77,8 @@ const Header = ({ toggleSidebar }) => {
         </div>
 
         {/* RIGHT */}
-        <div className="flex items-center gap-3">
-          {/* NOTIFICATIONS (UNCHANGED UI/CSS) */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* NOTIFICATIONS - MOBILE RESPONSIVE */}
           <div className="relative" ref={notifRef}>
             <button
               onClick={() => setOpen((prev) => !prev)}
@@ -97,11 +96,11 @@ const Header = ({ toggleSidebar }) => {
               )}
             </button>
 
-            {/* 🔴 YOUR NOTIFICATION DROPDOWN (UNCHANGED COMPLETELY) */}
+            {/* ✅ FIXED: Mobile responsive dropdown */}
             <div
-              className={`absolute top-full right-0 mt-3 w-96 bg-white/90 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-2xl overflow-hidden z-50 origin-top-right transition-all duration-300 ease-out ${
+              className={`fixed sm:absolute top-16 sm:top-full left-0 sm:left-auto sm:right-0 w-full sm:w-96 bg-white/95 sm:bg-white/90 backdrop-blur-xl border-b sm:border border-slate-200 rounded-none sm:rounded-2xl shadow-none sm:shadow-2xl overflow-hidden z-50 origin-top-right transition-all duration-300 ease-out ${
                 open
-                  ? "opacity-100 scale-100 translate-y-0"
+                  ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
                   : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
               }`}
             >
@@ -123,7 +122,7 @@ const Header = ({ toggleSidebar }) => {
                 </button>
               </div>
 
-              <div className="max-h-80 overflow-y-auto">
+              <div className="max-h-[70vh] sm:max-h-80 overflow-y-auto">
                 {notifications.map((n) => (
                   <div
                     key={n.id}
@@ -166,14 +165,14 @@ const Header = ({ toggleSidebar }) => {
             </div>
           </div>
 
-          {/* USER DROPDOWN (NEW ONLY) */}
+          {/* USER DROPDOWN */}
           <div
-            className="relative flex items-center gap-3 pl-3 border-l border-slate-200"
+            className="relative flex items-center gap-2 sm:gap-3 pl-2 sm:pl-3 border-l border-slate-200"
             ref={userRef}
           >
             <button
               onClick={() => setUserOpen((prev) => !prev)}
-              className="flex items-center gap-3"
+              className="flex items-center gap-2 sm:gap-3"
             >
               <div className="w-9 h-9 rounded-xl bg-linear-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white">
                 <User size={18} />
@@ -189,36 +188,45 @@ const Header = ({ toggleSidebar }) => {
               </div>
             </button>
 
-            {userOpen && (
-              <div
-                className={`absolute right-0 top-full mt-3 w-48 bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden z-50 origin-top-right transition-all duration-300 ease-out ${
-                  userOpen
-                    ? "opacity-100 scale-100 translate-y-0"
-                    : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
-                }`}
-              >
-                <button
-                  onClick={() => {
-                    navigate("/profile");
-                    setUserOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50"
-                >
-                  Profile
-                </button>
-
-                <button
-                  className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50"
-                  onClick={() => {
-                    logout(); // clears token + user
-                    setUserOpen(false); // close dropdown
-                    navigate("/login"); // go to login page
-                  }}
-                >
-                  Logout
-                </button>
+            {/* ✅ FIXED: Mobile responsive user dropdown */}
+            <div
+              className={`fixed sm:absolute right-0 top-16 sm:top-full mt-0 sm:mt-3 w-full sm:w-48 bg-white border-b sm:border border-slate-200 rounded-none sm:rounded-xl shadow-none sm:shadow-lg overflow-hidden z-50 origin-top-right transition-all duration-300 ease-out ${
+                userOpen
+                  ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
+                  : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
+              }`}
+            >
+              {/* Mobile: Show user info in dropdown */}
+              <div className="sm:hidden px-4 py-3 border-b border-slate-100 bg-slate-50/50">
+                <p className="text-sm font-semibold text-slate-900">
+                  {user?.username || "User"}
+                </p>
+                <p className="text-xs text-slate-500">
+                  {user?.email || "user@example.com"}
+                </p>
               </div>
-            )}
+
+              <button
+                onClick={() => {
+                  navigate("/profile");
+                  setUserOpen(false);
+                }}
+                className="w-full text-left px-4 py-3 sm:py-2 text-sm hover:bg-slate-50"
+              >
+                Profile
+              </button>
+
+              <button
+                className="w-full text-left px-4 py-3 sm:py-2 text-sm text-red-500 hover:bg-red-50"
+                onClick={() => {
+                  logout();
+                  setUserOpen(false);
+                  navigate("/login");
+                }}
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </div>
