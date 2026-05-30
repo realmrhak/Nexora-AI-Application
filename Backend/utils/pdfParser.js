@@ -1,15 +1,5 @@
 // ❌ import axios from "axios"; <-- IS LINE KO HATA DENA YA COMMENT KAR DENA
 
-let pdfParse;
-
-async function getPdfParser() {
-  if (!pdfParse) {
-    const module = await import("pdf-parse");
-    pdfParse = module.default || module;
-  }
-  return pdfParse;
-}
-
 /**
  * Extract text from PDF URL using Native Fetch (No Axios, No Auth headers)
  */
@@ -21,7 +11,6 @@ export const extractTextFromPDF = async (fileUrl) => {
 
     console.log("📥 Fetching PDF (Using Native Fetch):", fileUrl);
 
-    // Node.js ka built-in fetch use karein (Koi auth header nahi bhega)
     const response = await fetch(fileUrl);
     
     if (!response.ok) {
@@ -33,8 +22,13 @@ export const extractTextFromPDF = async (fileUrl) => {
 
     console.log("📄 Parsing PDF...");
 
-    const pdfParser = await getPdfParser();
-    const data = await pdfParser(buffer);
+    // ✅ FIX: Direct import with proper default export handling
+    const pdfParseModule = await import("pdf-parse");
+    
+    // pdf-parse exports as default, so check both possibilities
+    const pdfParse = pdfParseModule.default?.default || pdfParseModule.default || pdfParseModule;
+
+    const data = await pdfParse(buffer);
 
     const text = (data.text || "").trim();
 
