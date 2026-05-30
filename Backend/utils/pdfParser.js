@@ -1,7 +1,15 @@
 import axios from "axios";
 
-// Dynamic import for CommonJS package compatibility
-const pdfParse = (await import("pdf-parse")).default;
+// Dynamic import for pdf-parse (CommonJS compatibility)
+let pdfParse;
+
+async function getPdfParser() {
+  if (!pdfParse) {
+    const module = await import("pdf-parse");
+    pdfParse = module.default || module;
+  }
+  return pdfParse;
+}
 
 /**
  * Extract text from PDF URL
@@ -21,18 +29,17 @@ export const extractTextFromPDF = async (fileUrl) => {
       maxBodyLength: 50 * 1024 * 1024,
     });
 
-    // Convert response to buffer
     const buffer = Buffer.from(response.data);
 
     console.log("📄 Parsing PDF...");
 
-    // Parse PDF
-    const data = await pdfParse(buffer);
+    const pdfParser = await getPdfParser();
+    const data = await pdfParser(buffer);
 
     const text = (data.text || "").trim();
 
     if (!text) {
-      throw new Error("No extractable text found");
+      throw new Error("No extractable text found in PDF");
     }
 
     console.log("✅ PDF parsed successfully");
@@ -46,10 +53,7 @@ export const extractTextFromPDF = async (fileUrl) => {
     };
 
   } catch (error) {
-    console.error("❌ PDF ERROR:", error);
-
-    throw new Error(
-      error.message || "Failed to extract PDF text"
-    );
+    console.error("❌ PDF Extraction Error:", error.message);
+    throw new Error(error.message || "Failed to extract text from PDF");
   }
 };
