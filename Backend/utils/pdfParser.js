@@ -1,5 +1,5 @@
 // Pehle: import axios from "axios"; ❌ (Hata dein ya isolate karein)
-import axios from "axios";
+// import axios from "axios";
 
 // Ek clean axios instance banayen sirf PDF download ke liye
 const pdfDownloader = axios.create();
