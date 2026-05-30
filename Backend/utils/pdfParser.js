@@ -1,6 +1,5 @@
 // ❌ import axios from "axios"; <-- HATA DO
 
-// ✅ pdf2json is CommonJS, use default import
 import PDFParser from "pdf2json";
 
 /**
@@ -33,7 +32,28 @@ export const extractTextFromPDF = async (fileUrl) => {
       });
       
       pdfParser.on("pdfParser_dataReady", (pdfData) => {
-        const text = pdfParser.getRawTextContent().trim();
+        // ✅ FIX: pdf2json ka text extraction - Pages se manually extract karo
+        let text = "";
+        
+        if (pdfData.Pages && pdfData.Pages.length > 0) {
+          for (const page of pdfData.Pages) {
+            if (page.Texts && page.Texts.length > 0) {
+              for (const textItem of page.Texts) {
+                if (textItem.R && textItem.R.length > 0) {
+                  for (const run of textItem.R) {
+                    // pdf2json text ko decodeURIComponent karta hai
+                    const decodedText = decodeURIComponent(run.T || "");
+                    text += decodedText + " ";
+                  }
+                }
+              }
+            }
+            text += "\n"; // Page break
+          }
+        }
+        
+        text = text.trim();
+        
         resolve({
           text,
           numPages: pdfData.Pages?.length || 0,
