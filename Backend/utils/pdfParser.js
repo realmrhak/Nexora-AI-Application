@@ -1,8 +1,4 @@
-// Pehle: import axios from "axios"; ❌ (Hata dein ya isolate karein)
-// import axios from "axios";
-
-// Ek clean axios instance banayen sirf PDF download ke liye
-const pdfDownloader = axios.create();
+// ❌ import axios from "axios"; <-- IS LINE KO HATA DENA YA COMMENT KAR DENA
 
 let pdfParse;
 
@@ -15,7 +11,7 @@ async function getPdfParser() {
 }
 
 /**
- * Extract text from PDF URL
+ * Extract text from PDF URL using Native Fetch (No Axios, No Auth headers)
  */
 export const extractTextFromPDF = async (fileUrl) => {
   try {
@@ -23,21 +19,17 @@ export const extractTextFromPDF = async (fileUrl) => {
       throw new Error("No file URL provided");
     }
 
-    console.log("📥 Fetching PDF:", fileUrl);
+    console.log("📥 Fetching PDF (Using Native Fetch):", fileUrl);
 
-    // Yahan global axios ki jagah apna clean instance use karein
-    const response = await pdfDownloader.get(fileUrl, {
-      responseType: "arraybuffer",
-      timeout: 120000,
-      maxContentLength: 50 * 1024 * 1024, // 50MB
-      maxBodyLength: 50 * 1024 * 1024,
-      // Optional: Agar Cloudinary still mana kare toh headers manually empty karein
-      headers: {
-        'Authorization': '' 
-      }
-    });
+    // Node.js ka built-in fetch use karein (Koi auth header nahi bhega)
+    const response = await fetch(fileUrl);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch PDF! Status: ${response.status} ${response.statusText}`);
+    }
 
-    const buffer = Buffer.from(response.data);
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
     console.log("📄 Parsing PDF...");
 
