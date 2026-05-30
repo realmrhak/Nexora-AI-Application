@@ -1,6 +1,9 @@
+// Pehle: import axios from "axios"; ❌ (Hata dein ya isolate karein)
 import axios from "axios";
 
-// Dynamic import for pdf-parse (CommonJS compatibility)
+// Ek clean axios instance banayen sirf PDF download ke liye
+const pdfDownloader = axios.create();
+
 let pdfParse;
 
 async function getPdfParser() {
@@ -22,11 +25,16 @@ export const extractTextFromPDF = async (fileUrl) => {
 
     console.log("📥 Fetching PDF:", fileUrl);
 
-    const response = await axios.get(fileUrl, {
+    // Yahan global axios ki jagah apna clean instance use karein
+    const response = await pdfDownloader.get(fileUrl, {
       responseType: "arraybuffer",
       timeout: 120000,
       maxContentLength: 50 * 1024 * 1024, // 50MB
       maxBodyLength: 50 * 1024 * 1024,
+      // Optional: Agar Cloudinary still mana kare toh headers manually empty karein
+      headers: {
+        'Authorization': '' 
+      }
     });
 
     const buffer = Buffer.from(response.data);
