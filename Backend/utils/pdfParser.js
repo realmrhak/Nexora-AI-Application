@@ -1,3 +1,10 @@
+// ❌ import axios from "axios"; <-- HATA DO
+
+import { PDFParser } from "pdf2json";
+
+/**
+ * Extract text from PDF URL using Native Fetch + pdf2json
+ */
 export const extractTextFromPDF = async (fileUrl) => {
   try {
     if (!fileUrl) {
@@ -6,7 +13,6 @@ export const extractTextFromPDF = async (fileUrl) => {
 
     console.log("📥 Fetching PDF:", fileUrl);
 
-    // Native Fetch (No Axios, No Auth headers)
     const response = await fetch(fileUrl);
     
     if (!response.ok) {
@@ -18,31 +24,37 @@ export const extractTextFromPDF = async (fileUrl) => {
 
     console.log("📄 Parsing PDF...");
 
-    // ✅ FIX: 'PDFParse' ko explicitly extract karna
-    const pdfModule = await import("pdf-parse");
-    const pdfParse = pdfModule.PDFParse || pdfModule.default || pdfModule;
+    const pdfParser = new PDFParser();
 
-    if (typeof pdfParse !== 'function') {
-        console.error("❌ Could not find parse function. Available keys:", Object.keys(pdfModule));
-        throw new Error("pdf-parse library did not load a valid function");
-    }
+    const result = await new Promise((resolve, reject) => {
+      pdfParser.on("pdfParser_dataError", (err) => {
+        reject(new Error(err.parserError || "PDF parsing failed"));
+      });
+      
+      pdfParser.on("pdfParser_dataReady", (pdfData) => {
+        const text = pdfParser.getRawTextContent().trim();
+        resolve({
+          text,
+          numPages: pdfData.Pages?.length || 0,
+          info: pdfData.Meta || {},
+        });
+      });
 
-    const data = await pdfParse(buffer);
+      pdfParser.parseBuffer(buffer);
+    });
 
-    const text = (data.text || "").trim();
-
-    if (!text) {
+    if (!result.text) {
       throw new Error("No extractable text found in PDF");
     }
 
     console.log("✅ PDF parsed successfully");
 
     return {
-      text,
-      numPages: data.numpages || 0,
-      info: data.info || {},
-      metadata: data.metadata || null,
-      version: data.version || null,
+      text: result.text,
+      numPages: result.numPages,
+      info: result.info,
+      metadata: null,
+      version: null,
     };
 
   } catch (error) {
