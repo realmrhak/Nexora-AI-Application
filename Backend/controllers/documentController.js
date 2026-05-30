@@ -4,6 +4,7 @@ import Quiz from '../models/Quiz.js';
 import { extractTextFromPDF } from '../utils/pdfParser.js';
 import { chunkText } from '../utils/textChunker.js';
 import mongoose from 'mongoose';
+import { v2 as cloudinary } from 'cloudinary'; // ✅ Cloudinary SDK Import kiya
 
 // @desc    Upload PDF document
 // @route   POST /api/documents/upload
@@ -32,7 +33,7 @@ export const uploadDocument = async (req, res, next) => {
         const fileUrl = req.file.path;
 
         console.log("📄 Uploaded file:", req.file);
-        console.log("🌐 File URL used:", fileUrl);
+        console.log("🌐 Public File URL:", fileUrl);
 
         if (!fileUrl) {
             return res.status(500).json({
@@ -42,18 +43,31 @@ export const uploadDocument = async (req, res, next) => {
             });
         }
 
+        // ✅ STEP ADDED: Generate Signed URL for secure backend fetching
+        let fetchUrl = fileUrl; // Default to public URL
+        if (req.file.filename) {
+            fetchUrl = cloudinary.url(req.file.filename, {
+                resource_type: "raw", // PDF ke liye zaroori hai
+                type: "upload",       
+                sign_url: true,       // Secret token add karega
+                secure: true,         // HTTPS URL dega
+                expires_at: Math.floor(Date.now() / 1000) + 3600 // 1 hour expiry
+            });
+            console.log("🔑 Signed URL generated for PDF extraction");
+        }
+
         // Create document record
         const document = await Document.create({
             userId: req.user._id,
             title,
             fileName: req.file.originalname,
-            filePath: fileUrl,
+            filePath: fileUrl, // Frontend ke liye hum public URL save karenge
             fileSize: req.file.size,
             status: "processing",
         });
 
-        // Process PDF (async)
-        processPDF(document._id, fileUrl).catch((err) => {
+        // Process PDF (async) - ✅ Ab Signed URL (fetchUrl) bhej rahe hain
+        processPDF(document._id, fetchUrl).catch((err) => {
             console.error("PDF processing error:", err);
         });
 
@@ -70,11 +84,11 @@ export const uploadDocument = async (req, res, next) => {
 };
 
 // Helper function to process PDF
-const processPDF = async (documentId, filePath) => {
+const processPDF = async (documentId, pdfUrl) => { // ✅ Parameter name change kiya for clarity
 
     try {
 
-        const { text } = await extractTextFromPDF(filePath);
+        const { text } = await extractTextFromPDF(pdfUrl); // ✅ Signed URL use ho raha hai
 
         if (!text.trim()) {
 
@@ -97,16 +111,16 @@ const processPDF = async (documentId, filePath) => {
             $set: {
                 extractedText: text,
                 chunks,
-                status: 'ready',
+                status: 'ready', // ✅ Ab yahan ready aayega
             },
             $unset: { processingError: 1 },
         });
 
-        console.log(`Document ${documentId} processed successfully`);
+        console.log(`✅ Document ${documentId} processed successfully`);
 
     } catch (error) {
 
-        console.error(`Error processing document ${documentId}:`, error);
+        console.error(`❌ Error processing document ${documentId}:`, error);
 
         const msg =
             error instanceof Error ? error.message : 'PDF processing failed';
