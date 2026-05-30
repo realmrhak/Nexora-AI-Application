@@ -1,16 +1,14 @@
-// ❌ import axios from "axios"; <-- IS LINE KO HATA DENA YA COMMENT KAR DENA
+// Axios ko hataya diya hai, native fetch use karenge
 
-/**
- * Extract text from PDF URL using Native Fetch (No Axios, No Auth headers)
- */
 export const extractTextFromPDF = async (fileUrl) => {
   try {
     if (!fileUrl) {
       throw new Error("No file URL provided");
     }
 
-    console.log("📥 Fetching PDF (Using Native Fetch):", fileUrl);
+    console.log("📥 Fetching PDF:", fileUrl);
 
+    // Native Fetch (No Axios, No Auth headers)
     const response = await fetch(fileUrl);
     
     if (!response.ok) {
@@ -22,11 +20,16 @@ export const extractTextFromPDF = async (fileUrl) => {
 
     console.log("📄 Parsing PDF...");
 
-    // ✅ FIX: Direct import with proper default export handling
-    const pdfParseModule = await import("pdf-parse");
-    
-    // pdf-parse exports as default, so check both possibilities
-    const pdfParse = pdfParseModule.default?.default || pdfParseModule.default || pdfParseModule;
+    // ✅ FIX: Robust Dynamic Import for pdf-parse
+    const pdfModule = await import("pdf-parse");
+    // CommonJS module default export ko safely extract karna
+    const pdfParse = typeof pdfModule === 'function' ? pdfModule : pdfModule.default;
+
+    // Agar phir bhi function nahi mila (rare edge case)
+    if (typeof pdfParse !== 'function') {
+        console.error("Imported module structure:", pdfModule);
+        throw new Error("pdf-parse library did not load as a function");
+    }
 
     const data = await pdfParse(buffer);
 
