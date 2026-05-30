@@ -1,16 +1,12 @@
-// ❌ import axios from "axios"; <-- IS LINE KO HATA DENA YA COMMENT KAR DENA
-
-/**
- * Extract text from PDF URL using Native Fetch
- */
 export const extractTextFromPDF = async (fileUrl) => {
   try {
     if (!fileUrl) {
       throw new Error("No file URL provided");
     }
 
-    console.log("📥 Fetching PDF (Using Native Fetch):", fileUrl);
+    console.log("📥 Fetching PDF:", fileUrl);
 
+    // Native Fetch (No Axios, No Auth headers)
     const response = await fetch(fileUrl);
     
     if (!response.ok) {
@@ -22,11 +18,16 @@ export const extractTextFromPDF = async (fileUrl) => {
 
     console.log("📄 Parsing PDF...");
 
-    // ✅ FIX: pdf-parse uses PDFParse class, not default export
-    const { PDFParse } = await import("pdf-parse");
-    
-    const pdfParser = new PDFParse();
-    const data = await pdfParser.load(buffer);
+    // ✅ FIX: 'PDFParse' ko explicitly extract karna
+    const pdfModule = await import("pdf-parse");
+    const pdfParse = pdfModule.PDFParse || pdfModule.default || pdfModule;
+
+    if (typeof pdfParse !== 'function') {
+        console.error("❌ Could not find parse function. Available keys:", Object.keys(pdfModule));
+        throw new Error("pdf-parse library did not load a valid function");
+    }
+
+    const data = await pdfParse(buffer);
 
     const text = (data.text || "").trim();
 
