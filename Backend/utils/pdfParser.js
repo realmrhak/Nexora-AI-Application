@@ -1,6 +1,7 @@
 // ❌ import axios from "axios"; <-- HATA DO
 
-import { PDFParser } from "pdf2json";
+// ✅ pdf2json is CommonJS, use default import
+import PDFParser from "pdf2json";
 
 /**
  * Extract text from PDF URL using Native Fetch + pdf2json
