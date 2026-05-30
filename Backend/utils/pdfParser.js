@@ -1,7 +1,7 @@
 // ❌ import axios from "axios"; <-- IS LINE KO HATA DENA YA COMMENT KAR DENA
 
 /**
- * Extract text from PDF URL using Native Fetch (No Axios, No Auth headers)
+ * Extract text from PDF URL using Native Fetch
  */
 export const extractTextFromPDF = async (fileUrl) => {
   try {
@@ -22,16 +22,11 @@ export const extractTextFromPDF = async (fileUrl) => {
 
     console.log("📄 Parsing PDF...");
 
-    // ✅ FIX: Direct import with proper default export handling
-const pdfParseModule = await import("pdf-parse");
-console.log("Module structure:", Object.keys(pdfParseModule));
-console.log("Module.default:", pdfParseModule.default);
-console.log("Module.default type:", typeof pdfParseModule.default);
+    // ✅ FIX: pdf-parse uses PDFParse class, not default export
+    const { PDFParse } = await import("pdf-parse");
     
-    // pdf-parse exports as default, so check both possibilities
-    const pdfParse = pdfParseModule.default?.default || pdfParseModule.default || pdfParseModule;
-
-    const data = await pdfParse(buffer);
+    const pdfParser = new PDFParse();
+    const data = await pdfParser.load(buffer);
 
     const text = (data.text || "").trim();
 
