@@ -7,6 +7,9 @@ const storage = new CloudinaryStorage({
   params: async (req, file) => ({
     folder: "ai-learning-assistant",
     resource_type: "raw",
+    type: "upload",              // Public upload type force karta hai
+    access_mode: "public",        // Explicitly public access
+    upload_preset: "ai_public_raw", // Unsigned preset jo tum banaye ho
     public_id: `${Date.now()}-${file.originalname}`,
   }),
 });
