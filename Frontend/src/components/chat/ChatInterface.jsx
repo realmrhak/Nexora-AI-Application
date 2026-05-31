@@ -78,7 +78,7 @@ const ChatInterface = () => {
     const isUser = msg.role === 'user';
     return (
       <div key={index} className={`flex w-full mb-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
-        <div className={`flex items-start gap-2 max-w-[95%] sm:max-w-[90%] md:max-w-[85%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+        <div className={`flex items-start gap-2 max-w-full sm:max-w-[90%] md:max-w-[85%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
           {!isUser ? (
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 mt-0.5">
               <Sparkles className='w-3 h-3 sm:w-4 sm:h-4 text-white' strokeWidth={2} />
@@ -122,7 +122,7 @@ const ChatInterface = () => {
 
   return (
     // ✅ FIXED: h-[94%] instead of h-full
-    <div className='flex flex-col h-[87%] bg-white rounded-xl shadow-sm overflow-hidden w-full'>
+    <div className='flex flex-col h-[99%] bg-white rounded-xl shadow-sm overflow-hidden w-full'>
       {/* Messages area - ONLY THIS SCROLLS */}
       <div className="flex-1 overflow-y-auto p-2 sm:p-4 w-full min-h-0">
         {history.length === 0 ? (
