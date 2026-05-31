@@ -5,7 +5,6 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [
     react(),
-    tailwindcss(),
-    require('tailwind-scrollbar-hide')
+    tailwindcss()
   ],
 })
