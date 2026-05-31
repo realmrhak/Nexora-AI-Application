@@ -120,7 +120,7 @@ const ChatInterface = () => {
   }
 
   return (
-    <div className='flex flex-col h-[calc(100vh-270px)] sm:h-[90vh] bg-white rounded-xl shadow-sm overflow-hidden w-full'>
+    <div className='flex flex-col h-[calc(100vh-270px)] sm:h-[75vh] bg-white rounded-xl shadow-sm overflow-hidden w-full'>
       <div className="flex-1 overflow-y-auto p-2 sm:p-4 w-full">
         {history.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
