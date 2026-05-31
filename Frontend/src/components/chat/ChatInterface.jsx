@@ -122,7 +122,7 @@ const ChatInterface = () => {
 
   return (
     // ✅ FIXED: h-[94%] instead of h-full
-    <div className='flex flex-col h-[94%] bg-white rounded-xl shadow-sm overflow-hidden w-full'>
+    <div className='flex flex-col h-[87%] bg-white rounded-xl shadow-sm overflow-hidden w-full'>
       {/* Messages area - ONLY THIS SCROLLS */}
       <div className="flex-1 overflow-y-auto p-2 sm:p-4 w-full min-h-0">
         {history.length === 0 ? (
