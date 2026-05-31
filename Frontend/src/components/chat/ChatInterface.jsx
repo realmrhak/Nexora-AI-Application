@@ -109,7 +109,7 @@ const ChatInterface = () => {
 
   if (initialLoading) {
     return (
-      <div className="flex flex-col h-[60vh] sm:h-[80vh] bg-white rounded-xl items-center justify-center shadow-sm w-full">
+      <div className="flex flex-col h-full bg-white rounded-xl items-center justify-center shadow-sm w-full">
         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-100 flex items-center justify-center mb-3">
           <MessageSquare className='w-5 h-5 sm:w-6 sm:h-6 text-emerald-600' strokeWidth={2} />
         </div>
@@ -120,8 +120,9 @@ const ChatInterface = () => {
   }
 
   return (
-    <div className='flex flex-col h-[calc(100vh-270px)] sm:h-[75vh] bg-white rounded-xl shadow-sm overflow-hidden w-full'>
-      <div className="flex-1 overflow-y-auto p-2 sm:p-4 w-full">
+    <div className='flex flex-col h-full bg-white rounded-xl shadow-sm overflow-hidden w-full'>
+      {/* Messages area - ONLY THIS SCROLLS */}
+      <div className="flex-1 overflow-y-auto p-2 sm:p-4 w-full min-h-0">
         {history.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-emerald-100 flex items-center justify-center mb-3">
@@ -155,7 +156,8 @@ const ChatInterface = () => {
         )}
       </div>
 
-      <div className="p-2 sm:p-3 border-t border-slate-200 bg-white w-full">
+      {/* Input area - STAYS FIXED AT BOTTOM */}
+      <div className="p-2 sm:p-3 border-t border-slate-200 bg-white w-full shrink-0">
         <form onSubmit={handleSendMessage} className="flex items-center gap-2">
           <input 
             type="text"

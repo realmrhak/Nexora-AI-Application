@@ -164,7 +164,7 @@ const QuizManager = ({ documentId }) => {
                   <span className="hidden sm:inline">Generating...</span>
                   <span className="sm:hidden">Generating</span>
                 </>
-              ) : 'Generate'}
+              ) : 'Generate Quiz'}
             </Button>
           </div>
         </form>

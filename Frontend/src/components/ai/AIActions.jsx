@@ -119,20 +119,20 @@ const AIActions = () => {
                             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-3 sm:mb-4">
                                 Enter a topic or concept from the document to get a detailed explanation.
                             </p>
-                            {/* ✅ FIXED: Input full width, button below on next line */}
-                            <div className="flex flex-col gap-2">
+                            {/* ✅ FIXED: flex-col on mobile, flex-row on sm+ screens */}
+                            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                                 <input
                                     type="text"
                                     value={concept}
                                     onChange={(e) => setConcept(e.target.value)}
                                     placeholder="e.g., 'React Hooks'"
                                     disabled={loadingAction === 'explain'}
-                                    className="w-full h-10 sm:h-11 px-3 sm:px-4 border-2 border-slate-200 rounded-lg sm:rounded-xl bg-slate-50/50 text-slate-900 placeholder-slate-400 text-sm font-medium transition-all duration-200 focus:outline-none focus:border-emerald-500 focus:bg-white focus:shadow-lg focus:shadow-emerald-500/10"
+                                    className="w-full sm:flex-1 h-10 sm:h-11 px-3 sm:px-4 border-2 border-slate-200 rounded-lg sm:rounded-xl bg-slate-50/50 text-slate-900 placeholder-slate-400 text-sm font-medium transition-all duration-200 focus:outline-none focus:border-emerald-500 focus:bg-white focus:shadow-lg focus:shadow-emerald-500/10"
                                 />
                                 <button
                                     type="submit"
                                     disabled={loadingAction === 'explain' || !concept.trim()}
-                                    className="w-full sm:w-auto self-start h-10 sm:h-11 px-4 sm:px-5 bg-linear-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                                    className="w-full sm:w-auto h-10 sm:h-11 px-4 sm:px-5 bg-linear-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
                                 >
                                     {loadingAction === 'explain' ? (
                                         <span className="flex items-center justify-center gap-2">

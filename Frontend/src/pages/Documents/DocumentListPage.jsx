@@ -6,6 +6,7 @@ import documentService from '../../services/documentService';
 import Spinner from '../../components/common/Spinner';
 import Button from '../../components/common/Button';
 import DocumentCard from '../../components/documents/DocumentCard'
+import EmptyState from '../../components/common/EmptyState';
 
 const DocumentListPage = () => {
 
@@ -118,26 +119,12 @@ const DocumentListPage = () => {
 
         if (documents.length === 0) {
             return (
-                <div className='flex items-center justify-center min-h-[300px] sm:min-h-[400px] px-4'>
-                    <div className='text-center max-w-md flex flex-col items-center'>
-                        <div className='shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-linear-to-br from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25 mb-3 sm:mb-4'>
-                            <FileText className='w-5 h-5 sm:w-6 sm:h-6 text-white' strokeWidth={2} />
-                        </div>
-                        <h3 className="text-lg sm:text-xl font-medium text-slate-900 tracking-tight mb-2">
-                            No Documents Yet
-                        </h3>
-                        <p className="text-xs sm:text-sm text-slate-500 mb-4 sm:mb-6">
-                            Get started by uploading your first PDF document to begin learning
-                        </p>
-                        <Button
-                            onClick={() => setIsUploadModalOpen(true)}
-                            className='inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 active:scale-[0.98]'
-                        >
-                            <Plus className='w-3.5 h-3.5 sm:w-4 sm:h-4' strokeWidth={2.5} />
-                            Upload Document
-                        </Button>
-                    </div>
-                </div>
+                <EmptyState 
+                    onActionClick={() => setIsUploadModalOpen(true)}
+                    title="No Documents Yet"
+                    description="Get started by uploading your first PDF document to begin learning"
+                    buttonText="Upload Document"
+                />
             );
         }
 
@@ -170,16 +157,18 @@ const DocumentListPage = () => {
                             Manage and organize your learning materials
                         </p>
                     </div>
-                    {/* ✅ FIXED: Button on right side */}
-                    {documents.length > 0 && (
-                        <div className="flex justify-end">
-                            <Button onClick={() => setIsUploadModalOpen(true)} size="sm" className="text-xs sm:text-sm">
-                                <Plus className='w-3.5 h-3.5 sm:w-4 sm:h-4' strokeWidth={2.5} />
-                                <span className="hidden sm:inline">Upload Document</span>
-                                <span className="sm:hidden">Upload</span>
-                            </Button>
-                        </div>
-                    )}
+                    {/* ✅ FIXED: Always visible, properly aligned right */}
+                    <div className="flex justify-start sm:justify-end">
+                        <Button 
+                            onClick={() => setIsUploadModalOpen(true)} 
+                            size="sm" 
+                            className="text-xs sm:text-sm inline-flex items-center gap-2"
+                        >
+                            <Plus className='w-3.5 h-3.5 sm:w-4 sm:h-4' strokeWidth={2.5} />
+                            <span className="hidden sm:inline">Upload Document</span>
+                            <span className="sm:hidden">Upload</span>
+                        </Button>
+                    </div>
                 </div>
 
                 {renderContent()}

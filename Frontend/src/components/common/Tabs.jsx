@@ -2,9 +2,9 @@ import React from 'react'
 
 const Tabs = ({ tabs, activeTab, setActiveTab }) => {
   return (
-    <div className='w-full'>
+    <div className='w-full h-full flex flex-col'>
       {/* ✅ FIXED: Better scroll with snap points */}
-      <div className="relative border-b-2 border-slate-100 overflow-x-auto scrollbar-hide scroll-smooth snap-x">
+      <div className="relative border-b-2 border-slate-100 overflow-x-auto scrollbar-hide scroll-smooth snap-x shrink-0">
         <nav className="flex gap-1 sm:gap-2 min-w-max px-1">
           {tabs.map((tab) => (
             <button 
@@ -25,12 +25,12 @@ const Tabs = ({ tabs, activeTab, setActiveTab }) => {
         </nav>
       </div>
       
-      {/* ✅ FULL WIDTH content area - No card wrapper */}
-      <div className="w-full mt-3 sm:mt-4">
+      {/* ✅ FIXED: flex-1 min-h-0 so child can control its own scroll */}
+      <div className="flex-1 min-h-0 mt-3 sm:mt-4 overflow-hidden">
         {tabs.map((tab) => {
           if (tab.name === activeTab) {
             return (
-              <div key={tab.name} className='animate-in fade-in duration-300 w-full'>
+              <div key={tab.name} className='animate-in fade-in duration-300 w-full h-full'>
                 {tab.content}
               </div>
             );
