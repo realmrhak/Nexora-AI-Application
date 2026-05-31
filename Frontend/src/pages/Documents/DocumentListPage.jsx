@@ -147,8 +147,8 @@ const DocumentListPage = () => {
             <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [bg-size:16px_16px] opacity-30 pointer-events-none" />
 
             <div className='relative w-full max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6'>
-                {/* Header */}
-                <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-10 gap-3'>
+                {/* ✅ FIXED: Upload button same line as "My Documents" */}
+                <div className='flex items-center justify-between mb-6 sm:mb-10'>
                     <div>
                         <h1 className='text-xl sm:text-2xl font-medium text-slate-900 tracking-tight mb-1 sm:mb-2'>
                             My Documents
@@ -157,18 +157,15 @@ const DocumentListPage = () => {
                             Manage and organize your learning materials
                         </p>
                     </div>
-                    {/* ✅ FIXED: Always visible, properly aligned right */}
-                    <div className="flex justify-start sm:justify-end">
-                        <Button 
-                            onClick={() => setIsUploadModalOpen(true)} 
-                            size="sm" 
-                            className="text-xs sm:text-sm inline-flex items-center gap-2"
-                        >
-                            <Plus className='w-3.5 h-3.5 sm:w-4 sm:h-4' strokeWidth={2.5} />
-                            <span className="hidden sm:inline">Upload Document</span>
-                            <span className="sm:hidden">Upload</span>
-                        </Button>
-                    </div>
+                    <Button 
+                        onClick={() => setIsUploadModalOpen(true)} 
+                        size="sm" 
+                        className="text-xs sm:text-sm inline-flex items-center gap-2 shrink-0 ml-3"
+                    >
+                        <Plus className='w-3.5 h-3.5 sm:w-4 sm:h-4' strokeWidth={2.5} />
+                        <span className="hidden sm:inline">Upload Document</span>
+                        <span className="sm:hidden">Upload</span>
+                    </Button>
                 </div>
 
                 {renderContent()}

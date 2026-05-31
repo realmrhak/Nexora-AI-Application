@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import documentService from '../../services/documentService';
 import Spinner from '../../components/common/Spinner';
@@ -42,12 +42,22 @@ const DocumentDetailPage = () => {
     return `${baseUrl}${filePath.startsWith('/') ? '' : '/'}${filePath}`;
   };
 
+  const isMobile = useMemo(() => {
+    return /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+  }, []);
+
   const renderContent = () => {
     if (loading) return <Spinner />;
     if (!document || !document.data || !document.data.filePath) {
       return <div className="text-center p-8">PDF not available.</div>;
     }
     const pdfUrl = getPdfUrl();
+    const viewerUrl = isMobile
+      ? `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(pdfUrl)}`
+      : pdfUrl;
+
     return (
       <div className="bg-white rounded-lg overflow-hidden shadow-sm h-full flex flex-col">
         <div className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 border-b border-gray-200 shrink-0">
@@ -62,15 +72,33 @@ const DocumentDetailPage = () => {
             <span className="hidden sm:inline">Open in new tab</span>
           </a>
         </div>
-        {/* ✅ FIXED: flex-1 min-h-0 so iframe fills remaining space */}
         <div className="flex-1 min-h-0 bg-gray-100 p-1">
-          <iframe
-            src={pdfUrl}
-            className="w-full h-full bg-white rounded border border-gray-200"
-            title="PDF Viewer"
-            frameBorder="0"
-            style={{ colorScheme: 'Light' }}
-          />
+          {isMobile ? (
+            <div className="w-full h-full bg-white rounded border border-gray-200 flex flex-col overflow-hidden">
+              <iframe
+                src={viewerUrl}
+                className="w-full flex-1"
+                title="PDF Viewer"
+                frameBorder="0"
+              />
+              <a
+                href={pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-center font-medium text-sm transition-colors shrink-0"
+              >
+                Open PDF in Browser
+              </a>
+            </div>
+          ) : (
+            <iframe
+              src={pdfUrl}
+              className="w-full h-full bg-white rounded border border-gray-200"
+              title="PDF Viewer"
+              frameBorder="0"
+              style={{ colorScheme: 'Light' }}
+            />
+          )}
         </div>
       </div>
     );
@@ -93,23 +121,24 @@ const DocumentDetailPage = () => {
   if (!document) return <div className='text-center p-8'>Document not found.</div>;
 
   return (
-    <div className="w-full h-dvh bg-gray-50 flex flex-col overflow-hidden">
-      {/* ✅ FIXED: h-[100dvh] handles mobile browser chrome, flex-col contains children */}
-      <div className="w-full px-2 sm:px-4 lg:px-6 py-3 sm:py-4 flex-1 flex flex-col min-h-0">
-        {/* Back Link */}
-        <div className="mb-3 sm:mb-4 shrink-0">
+    // ✅ FIXED: h-screen instead of h-dvh, overflow-hidden on root
+    <div className="w-full h-screen bg-gray-50 overflow-hidden">
+      {/* Fixed height layout: calc(100vh - 0) with no outer scroll */}
+      <div className="w-full h-full px-2 sm:px-4 lg:px-6 py-3 sm:py-4 flex flex-col">
+        {/* Back Link - fixed */}
+        <div className="shrink-0 mb-3 sm:mb-4">
           <Link to="/documents" className='inline-flex items-center gap-2 text-xs sm:text-sm text-neutral-600 hover:text-neutral-900 transition-colors'>
             <ArrowLeft size={14} className="sm:w-4 sm:h-4" />
             Back to Documents
           </Link>
         </div>
 
-        {/* Title */}
+        {/* Title - fixed */}
         <div className="shrink-0">
           <PageHeader title={document.data.title} />
         </div>
 
-        {/* Tabs - flex-1 to take remaining space, min-h-0 for proper child sizing */}
+        {/* Tabs - takes remaining height, no overflow here */}
         <div className="flex-1 min-h-0 mt-3 sm:mt-4">
           <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
