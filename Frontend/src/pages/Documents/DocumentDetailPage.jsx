@@ -59,8 +59,8 @@ const DocumentDetailPage = () => {
       : pdfUrl;
 
     return (
-      <div className="bg-white rounded-lg overflow-hidden shadow-sm h-full flex flex-col">
-        <div className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 border-b border-gray-200 shrink-0">
+      <div className="bg-white rounded-lg overflow-hidden shadow-sm">
+        <div className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 border-b border-gray-200">
           <span className="text-sm font-medium text-gray-700">Document Viewer</span>
           <a
             href={pdfUrl}
@@ -72,9 +72,10 @@ const DocumentDetailPage = () => {
             <span className="hidden sm:inline">Open in new tab</span>
           </a>
         </div>
-        <div className="flex-1 min-h-0 bg-gray-100 p-1">
+        {/* ✅ FIXED: Explicit height for PDF viewer */}
+        <div className="bg-gray-100 p-1">
           {isMobile ? (
-            <div className="w-full h-full bg-white rounded border border-gray-200 flex flex-col overflow-hidden">
+            <div className="w-full h-[50vh] bg-white rounded border border-gray-200 flex flex-col overflow-hidden">
               <iframe
                 src={viewerUrl}
                 className="w-full flex-1"
@@ -93,7 +94,7 @@ const DocumentDetailPage = () => {
           ) : (
             <iframe
               src={pdfUrl}
-              className="w-full h-full bg-white rounded border border-gray-200"
+              className="w-full h-[70vh] bg-white rounded border border-gray-200"
               title="PDF Viewer"
               frameBorder="0"
               style={{ colorScheme: 'Light' }}
@@ -121,7 +122,6 @@ const DocumentDetailPage = () => {
   if (!document) return <div className='text-center p-8'>Document not found.</div>;
 
   return (
-    // ✅ FIXED: h-screen aur overflow-hidden hata diya — AppLayout handle karega scroll
     <div className="w-full bg-gray-50">
       <div className="w-full px-2 sm:px-4 lg:px-6 py-3 sm:py-4">
         {/* Back Link */}
