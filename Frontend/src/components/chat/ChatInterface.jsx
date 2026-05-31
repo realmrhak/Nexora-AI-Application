@@ -90,72 +90,82 @@ const ChatInterface = () => {
     const renderMessage = (msg, index) => {
         const isUser = msg.role === 'user';
         return(
-            <div key={index} className={`flex items-start gap-2 sm:gap-3 my-3 sm:my-4 ${isUser ? 'justify-end' : ''}`}>
-                {!isUser && (
-                    <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-linear-to-br from-emerald-400 to-teal-500 shadow-lg shadow-emerald-500/25 flex items-center justify-center shrink-0">
-                        <Sparkles className='w-3 h-3 sm:w-4 sm:h-4 text-white' strokeWidth={2} />
-                    </div>
-                )}
-                <div className={`max-w-[85%] sm:max-w-lg p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm ${
-                    isUser
-                    ? 'bg-linear-to-br from-emerald-500 to-teal-500 text-white rounded-br-md'
-                    : 'bg-white border border-slate-200/60 text-slate-800 rounded-bl-md'
-                }`}>
-                    {isUser ? (
-                        <p className="text-sm leading-relaxed break-words">{msg.content}</p>
+            <div key={index} className={`flex w-full mb-4 ${isUser ? 'justify-end' : 'justify-start'}`}>
+                <div className={`flex items-start gap-2 max-w-[90%] sm:max-w-[80%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+                    {/* Avatar */}
+                    {!isUser ? (
+                        <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 mt-1">
+                            <Sparkles className='w-4 h-4 text-white' strokeWidth={2} />
+                        </div>
                     ) : (
-                        <div className="prose prose-sm max-w-none prose-slate overflow-x-auto">
-                            <MarkdownRenderer content={msg.content} />
+                        <div className="w-8 h-8 rounded-full bg-slate-300 flex items-center justify-center text-slate-700 font-bold text-sm shrink-0 mt-1">
+                            {user?.username?.charAt(0).toUpperCase() || 'U'}
                         </div>
                     )}
-                </div>
-                {isUser && (
-                    <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-linear-to-br from-slate-200 to-slate-300 flex items-center justify-center text-slate-700 font-semibold text-xs sm:text-sm shrink-0 shadow-sm">
-                        {user?.username?.charAt(0).toUpperCase() || 'U'}
+                    
+                    {/* Message Bubble */}
+                    <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed wrap-break-words overflow-hidden ${
+                        isUser
+                        ? 'bg-emerald-500 text-white rounded-tr-sm'
+                        : 'bg-white border border-slate-200 text-slate-800 rounded-tl-sm'
+                    }`}>
+                        {isUser ? (
+                            <p>{msg.content}</p>
+                        ) : (
+                            <div className="prose prose-sm max-w-none">
+                                <MarkdownRenderer content={msg.content} />
+                            </div>
+                        )}
                     </div>
-                )}
+                </div>
             </div>
         );
     };
 
     if (initialLoading) {
         return (
-            <div className="flex flex-col h-[60vh] sm:h-[70vh] bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-2xl items-center justify-center shadow-xl shadow-slate-200/50 mx-2 sm:mx-0">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-linear-to-br from-emerald-100 to-teal-100 flex items-center justify-center mb-4">
-                    <MessageSquare className='w-6 h-6 sm:w-7 sm:h-7 text-emerald-600' strokeWidth={2} />
+            <div className="flex flex-col h-[60vh] bg-white border border-slate-200 rounded-2xl items-center justify-center shadow-lg">
+                <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
+                    <MessageSquare className='w-6 h-6 text-emerald-600' strokeWidth={2} />
                 </div>
                 <Spinner />
-                <p className="text-sm text-slate-500 mt-3 font-medium">Loading chat history</p>
+                <p className="text-sm text-slate-500 mt-3">Loading chat history</p>
             </div>
         );
     }
 
     return (
-        <div className='flex flex-col h-[calc(100vh-180px)] sm:h-[70vh] bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden mx-2 sm:mx-0'>
+        <div className='flex flex-col h-[calc(100vh-200px)] sm:h-[70vh] bg-white border border-slate-200 rounded-2xl shadow-lg overflow-hidden'>
             {/* Messages Area */}
-            <div className="flex-1 p-3 sm:p-6 overflow-y-auto bg-linear-to-br from-slate-50/50 via-white/50 to-slate-50/50">
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4">
                 {history.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-full text-center px-4">
-                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-linear-to-br from-emerald-100 to-teal-100 flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/10">
-                            <MessageSquare className='w-6 h-6 sm:w-8 sm:h-8 text-emerald-600' strokeWidth={2} />
+                    <div className="flex flex-col items-center justify-center h-full text-center p-4">
+                        <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
+                            <MessageSquare className='w-7 h-7 text-emerald-600' strokeWidth={2} />
                         </div>
-                        <h3 className="text-sm sm:text-base font-semibold text-slate-900 mb-2">Start a conversation</h3>
-                        <p className="text-xs sm:text-sm text-slate-500">Ask me anything about the document!</p>
+                        <h3 className="text-base font-semibold text-slate-900 mb-1">Start a conversation</h3>
+                        <p className="text-sm text-slate-500">Ask me anything about the document!</p>
                     </div>
                 ) : (
-                    history.map(renderMessage)
+                    <div className="space-y-2">
+                        {history.map(renderMessage)}
+                    </div>
                 )}
                 <div ref={messagesEndRef} />
+                
+                {/* Loading indicator */}
                 {loading && (
-                    <div className="flex items-center gap-2 sm:gap-3 my-3 sm:my-4">
-                        <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-linear-to-br from-emerald-400 to-teal-500 shadow-lg shadow-emerald-500/25 flex items-center justify-center shrink-0">
-                            <Sparkles className='w-3 h-3 sm:w-4 sm:h-4 text-white' strokeWidth={2} />
-                        </div>
-                        <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl rounded-bl-md bg-white border border-slate-200/60">
-                            <div className="flex gap-1">
-                                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms'}}></span>
-                                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms'}}></span>
-                                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms'}}></span>
+                    <div className="flex w-full mb-4 justify-start">
+                        <div className="flex items-start gap-2 max-w-[90%]">
+                            <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
+                                <Sparkles className='w-4 h-4 text-white animate-spin' strokeWidth={2} />
+                            </div>
+                            <div className="px-4 py-3 rounded-2xl rounded-tl-sm bg-white border border-slate-200">
+                                <div className="flex gap-1">
+                                    <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms'}}></span>
+                                    <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms'}}></span>
+                                    <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms'}}></span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -163,22 +173,22 @@ const ChatInterface = () => {
             </div>
 
             {/* Input Area */}
-            <div className="p-3 sm:p-5 border-t border-slate-200/60 bg-white/80">
-                <form onSubmit={handleSendMessage} className="flex items-center gap-2 sm:gap-3">
+            <div className="p-3 border-t border-slate-200 bg-white">
+                <form onSubmit={handleSendMessage} className="flex items-center gap-2">
                     <input 
                         type="text"
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         placeholder='Ask a follow-up question...'
                         disabled={loading}
-                        className="flex-1 h-10 sm:h-12 px-3 sm:px-4 border-2 border-slate-200 rounded-lg sm:rounded-xl bg-slate-50/50 text-slate-900 placeholder-slate-400 text-sm font-medium transition-all duration-200 focus:outline-none focus:border-emerald-500 focus:bg-white focus:shadow-lg focus:shadow-emerald-500/10" 
+                        className="flex-1 h-11 px-4 border border-slate-300 rounded-full bg-slate-50 text-sm focus:outline-none focus:border-emerald-500 focus:bg-white" 
                     />
                     <button 
                         type='submit'
                         disabled={loading || !message.trim()}
-                        className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-lg sm:rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 flex items-center justify-center"
+                        className="w-11 h-11 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full flex items-center justify-center disabled:opacity-50 active:scale-95 transition"
                     >
-                        <Send className='w-4 h-4 sm:w-5 sm:h-5' strokeWidth={2} />
+                        <Send className='w-5 h-5' strokeWidth={2} />
                     </button>
                 </form>
             </div>
