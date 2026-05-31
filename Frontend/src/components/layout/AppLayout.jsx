@@ -25,8 +25,8 @@ const AppLayout = ({ children }) => {
         {/* Sticky Header */}
         <Header toggleSidebar={toggleSidebar} />
 
-        {/* Scrollable Content */}
-        <main className="flex-1 overflow-y-hidden p-6">
+        {/* ✅ FIXED: Scrollable Content */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
           {children}
         </main>
 

@@ -121,25 +121,24 @@ const DocumentDetailPage = () => {
   if (!document) return <div className='text-center p-8'>Document not found.</div>;
 
   return (
-    // ✅ FIXED: h-screen instead of h-dvh, overflow-hidden on root
-    <div className="w-full h-screen bg-gray-50 overflow-hidden">
-      {/* Fixed height layout: calc(100vh - 0) with no outer scroll */}
-      <div className="w-full h-full px-2 sm:px-4 lg:px-6 py-3 sm:py-4 flex flex-col">
-        {/* Back Link - fixed */}
-        <div className="shrink-0 mb-3 sm:mb-4">
+    // ✅ FIXED: h-screen aur overflow-hidden hata diya — AppLayout handle karega scroll
+    <div className="w-full bg-gray-50">
+      <div className="w-full px-2 sm:px-4 lg:px-6 py-3 sm:py-4">
+        {/* Back Link */}
+        <div className="mb-3 sm:mb-4">
           <Link to="/documents" className='inline-flex items-center gap-2 text-xs sm:text-sm text-neutral-600 hover:text-neutral-900 transition-colors'>
             <ArrowLeft size={14} className="sm:w-4 sm:h-4" />
             Back to Documents
           </Link>
         </div>
 
-        {/* Title - fixed */}
-        <div className="shrink-0">
+        {/* Title */}
+        <div>
           <PageHeader title={document.data.title} />
         </div>
 
-        {/* Tabs - takes remaining height, no overflow here */}
-        <div className="flex-1 min-h-0 mt-3 sm:mt-4">
+        {/* Tabs */}
+        <div className="mt-3 sm:mt-4">
           <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
       </div>
