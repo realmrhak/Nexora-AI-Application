@@ -17,7 +17,7 @@
   }
 }
 
-/* In your global CSS or tailwind config */
+/* In your global CSS file */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;

@@ -10,7 +10,7 @@ const Button = ({
   size = "md",
 }) => {
   const baseStyles =
-    "inline-flex items-center justify-center gap-2 font-semibold rounded-xl transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 whitespace-nowrap";
+    "inline-flex items-center justify-center gap-2 font-semibold rounded-lg sm:rounded-xl transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 whitespace-nowrap";
 
   const variantStyles = {
     primary:
@@ -21,8 +21,9 @@ const Button = ({
   };
 
   const sizeStyles = {
-    sm: "h-9 px-4 text-xs",
-    md: "h-11 px-5 text-sm",
+    sm: "h-8 sm:h-9 px-3 sm:px-4 text-xs",
+    md: "h-10 sm:h-11 px-4 sm:px-5 text-xs sm:text-sm",
+    lg: "h-11 sm:h-12 px-5 sm:px-6 text-sm",
   };
 
   return (

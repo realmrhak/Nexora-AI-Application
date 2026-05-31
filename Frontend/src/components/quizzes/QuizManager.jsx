@@ -61,7 +61,6 @@ const QuizManager = ({ documentId }) => {
     setIsDeleteModalOpen(true);
   };
 
-
   const handleConfirmDelete = async () => {
     if (!selectedQuiz) return;
     setDeleting(true);
@@ -80,20 +79,26 @@ const QuizManager = ({ documentId }) => {
 
   const renderQuizContent = () => {
     if (loading) {
-      return <Spinner />
+      return (
+        <div className="flex items-center justify-center min-h-[200px] sm:min-h-[300px]">
+          <Spinner />
+        </div>
+      );
     }
 
     if (quizzes.length === 0) {
       return (
-        <EmptyState
-          title='No Quizzes Yet'
-          description='Generate a quiz from your document to test your knowledge.'
-        />
+        <div className="px-2 sm:px-0">
+          <EmptyState
+            title='No Quizzes Yet'
+            description='Generate a quiz from your document to test your knowledge.'
+          />
+        </div>
       );
     }
 
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
         {quizzes.map((quiz) => (
           <QuizCard key={quiz._id} quiz={quiz} onDelete={handleDeleteRequest} />
         ))}
@@ -102,17 +107,22 @@ const QuizManager = ({ documentId }) => {
   };
 
   return (
-    <div className='bg-white border border-neutral-200 rounded-lg p-6'>
+    <div className='w-full bg-white border border-neutral-200 rounded-lg sm:rounded-xl p-4 sm:p-6'>
       <div className="flex justify-end gap-2 mb-4">
-        <Button onClick={() => setIsGenerateModalOpen(true)}>
-          <Plus size={16} />
-          Generate Quiz
+        <Button 
+          onClick={() => setIsGenerateModalOpen(true)}
+          size="sm"
+          className="text-xs sm:text-sm"
+        >
+          <Plus size={14} className="sm:w-4 sm:h-4" />
+          <span className="hidden sm:inline">Generate Quiz</span>
+          <span className="sm:hidden">Generate</span>
         </Button>
       </div>
 
       {renderQuizContent()}
 
-      {/* Generate Quiz */}
+      {/* Generate Quiz Modal */}
       <Modal
         isOpen={isGenerateModalOpen}
         onClose={() => setIsGenerateModalOpen(false)}
@@ -128,7 +138,7 @@ const QuizManager = ({ documentId }) => {
               onChange={(e) => setNumQuestions(Math.max(1, parseInt(e.target.value) || 1))}
               min='1'
               required
-              className='w-full h-9 px-3 border border-neutral-200 rounded-lg bg-white text-sm text-neutral-900 placeholder-neutral-400 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-[#00d492] focus:border-transparent'
+              className='w-full h-9 sm:h-10 px-3 border border-neutral-200 rounded-lg bg-white text-sm text-neutral-900 placeholder-neutral-400 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-[#00d492] focus:border-transparent'
             />
           </div>
           <div className="flex justify-end gap-2">
@@ -136,13 +146,23 @@ const QuizManager = ({ documentId }) => {
               type='button'
               variant='secondary'
               onClick={() => setIsGenerateModalOpen(false)}
-              disabled={generating}>
+              disabled={generating}
+              size="sm"
+            >
               Cancel
             </Button>
             <Button
               type='submit'
-              disabled={generating}>
-              {generating ? 'Generating...' : 'Generate'}
+              disabled={generating}
+              size="sm"
+            >
+              {generating ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span className="hidden sm:inline">Generating...</span>
+                  <span className="sm:hidden">Generating</span>
+                </>
+              ) : 'Generate'}
             </Button>
           </div>
         </form>
@@ -154,8 +174,8 @@ const QuizManager = ({ documentId }) => {
         onClose={() => setIsDeleteModalOpen(false)}
         title='Confirm Delete Quiz' >
         <div className="space-y-4">
-          <p className="text-sm text-neutral-600">
-            Are you sure you want to delete the quiz: <span className='font-semibold text-neutral-900'>{selectedQuiz?.title || 'this quiz'}</span>? This action cannot be undone.
+          <p className="text-xs sm:text-sm text-neutral-600">
+            Are you sure you want to delete the quiz: <span className='font-semibold text-neutral-900 wrap-break-word'>{selectedQuiz?.title || 'this quiz'}</span>? This action cannot be undone.
           </p>
           <div className="flex justify-end gap-2 pt-2">
             <Button
@@ -163,12 +183,14 @@ const QuizManager = ({ documentId }) => {
               variant='outline'
               onClick={() => setIsDeleteModalOpen(false)}
               disabled={deleting}
+              size="sm"
             >
               Cancel
             </Button>
             <Button
               onClick={handleConfirmDelete}
               disabled={deleting}
+              size="sm"
               className='bg-red-500 hover:bg-red-600 active:bg-red-700 focus:ring-red-500'
             >
               {deleting ? 'Deleting...' : 'Delete'}
