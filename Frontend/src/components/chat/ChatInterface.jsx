@@ -110,7 +110,7 @@ const ChatInterface = () => {
   if (initialLoading) {
     return (
       // ✅ FIXED: h-[94%] instead of h-full
-      <div className="flex flex-col h-[94%] bg-white rounded-xl items-center justify-center shadow-sm w-full">
+      <div className="flex flex-col h-[87%] bg-white rounded-xl items-center justify-center shadow-sm w-full">
         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-100 flex items-center justify-center mb-3">
           <MessageSquare className='w-5 h-5 sm:w-6 sm:h-6 text-emerald-600' strokeWidth={2} />
         </div>
