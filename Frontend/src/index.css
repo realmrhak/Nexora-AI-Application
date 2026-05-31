@@ -16,3 +16,12 @@
     background-color: #fcfbfc;
   }
 }
+
+/* In your global CSS or tailwind config */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
