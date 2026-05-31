@@ -250,7 +250,9 @@ const FlashcardManager = ({ documentId }) => {
                             {flashcardSets.length === 1 ? 'set' : 'sets'} available
                         </p>
                     </div>
-                    <button className="group inline-flex items-center gap-2 px-4 sm:px-5 h-9 sm:h-11 bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold text-xs sm:text-sm rounded-lg sm:rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
+                    {/* ✅ FIXED: Compact button, not full-width */}
+                    <button
+                        className="group inline-flex items-center justify-center gap-2 px-4 sm:px-5 h-9 sm:h-11 bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold text-xs sm:text-sm rounded-lg sm:rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 w-auto self-start sm:self-auto"
                         onClick={handleGenerateFlashcards}
                         disabled={generating}
                     >

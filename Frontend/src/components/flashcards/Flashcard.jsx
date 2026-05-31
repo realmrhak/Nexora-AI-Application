@@ -30,7 +30,9 @@ const Flashcard = ({ flashcard, onToggleStar }) => {
 
                     {/* Star Button */}
                     <div className="flex items-start justify-between">
-                        <div className="bg-slate-100 text-[10px] text-slate-600 rounded px-2 sm:px-4 py-1 uppercase" > {flashcard?.difficulty}</div>
+                        <div className="bg-slate-100 text-[10px] text-slate-600 rounded px-2 sm:px-4 py-1 uppercase truncate max-w-[70%]">
+                            {flashcard?.difficulty}
+                        </div>
                         <button
                             className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center transition-all duration-200 ${flashcard.isStarred
                                 ? 'bg-linear-to-br from-amber-400 to-yellow-500 text-white shadow-lg shadow-amber-500/25'
@@ -45,9 +47,9 @@ const Flashcard = ({ flashcard, onToggleStar }) => {
                         </button>
                     </div>
 
-                    {/* Question Content */}
-                    <div className="flex-1 flex items-center justify-center px-2 sm:px-4 py-3 sm:py-6">
-                        <p className="text-sm sm:text-lg font-semibold text-slate-900 text-center leading-relaxed">
+                    {/* Question Content - ✅ FIXED: Better containment */}
+                    <div className="flex-1 flex items-center justify-center px-1 sm:px-4 py-2 sm:py-6 min-w-0 overflow-hidden">
+                        <p className="text-sm sm:text-lg font-semibold text-slate-900 text-center leading-relaxed wrap-break-word w-full">
                             {flashcard.question}
                         </p>
                     </div>
@@ -84,9 +86,9 @@ const Flashcard = ({ flashcard, onToggleStar }) => {
                         </button>
                     </div> 
 
-                    {/* Answers Content */}
-                    <div className="flex-1 flex items-center justify-center px-2 sm:px-4 py-3 sm:py-6">
-                        <p className="text-sm sm:text-base text-white font-medium text-center leading-relaxed">
+                    {/* Answers Content - ✅ FIXED: Better containment */}
+                    <div className="flex-1 flex items-center justify-center px-1 sm:px-4 py-2 sm:py-6 min-w-0 overflow-hidden">
+                        <p className="text-sm sm:text-base text-white font-medium text-center leading-relaxed wrap-break-word w-full">
                             {flashcard.answer}
                         </p>
                     </div>

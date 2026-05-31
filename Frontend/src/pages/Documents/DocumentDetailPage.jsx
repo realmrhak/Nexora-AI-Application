@@ -93,12 +93,12 @@ const DocumentDetailPage = () => {
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
-      {/* ✅ FULL WIDTH - No padding constraints */}
-      <div className="w-full px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
+      {/* ✅ FULL WIDTH - Minimal padding on mobile */}
+      <div className="w-full px-2 sm:px-4 lg:px-6 py-3 sm:py-4">
         {/* Back Link */}
         <div className="mb-3 sm:mb-4">
-          <Link to="/documents" className='inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900 transition-colors'>
-            <ArrowLeft size={16} />
+          <Link to="/documents" className='inline-flex items-center gap-2 text-xs sm:text-sm text-neutral-600 hover:text-neutral-900 transition-colors'>
+            <ArrowLeft size={14} className="sm:w-4 sm:h-4" />
             Back to Documents
           </Link>
         </div>

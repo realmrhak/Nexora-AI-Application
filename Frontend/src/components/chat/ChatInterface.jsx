@@ -78,7 +78,7 @@ const ChatInterface = () => {
     const isUser = msg.role === 'user';
     return (
       <div key={index} className={`flex w-full mb-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
-        <div className={`flex items-start gap-2 max-w-[92%] sm:max-w-[85%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+        <div className={`flex items-start gap-2 max-w-[95%] sm:max-w-[90%] md:max-w-[85%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
           {/* Avatar */}
           {!isUser ? (
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 mt-0.5">
@@ -90,16 +90,16 @@ const ChatInterface = () => {
             </div>
           )}
           
-          {/* Message Bubble */}
-          <div className={`px-3 py-2 sm:px-4 sm:py-3 rounded-xl text-sm leading-relaxed wrap-break-words ${
+          {/* Message Bubble - ✅ FIXED: Better text wrapping */}
+          <div className={`px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl text-sm leading-relaxed wrap-break-word overflow-hidden min-w-0 ${
             isUser
               ? 'bg-emerald-500 text-white rounded-tr-sm'
               : 'bg-white border border-slate-200 text-slate-800 rounded-tl-sm'
           }`}>
             {isUser ? (
-              <p>{msg.content}</p>
+              <p className="wrap-break-word">{msg.content}</p>
             ) : (
-              <div className="prose prose-sm max-w-none">
+              <div className="prose prose-sm max-w-none overflow-x-auto">
                 <MarkdownRenderer content={msg.content} />
               </div>
             )}
@@ -122,9 +122,9 @@ const ChatInterface = () => {
   }
 
   return (
-    <div className='flex flex-col h-[calc(100vh-220px)] sm:h-[70vh] bg-white rounded-xl shadow-sm overflow-hidden'>
+    <div className='flex flex-col h-[calc(100vh-180px)] sm:h-[70vh] bg-white rounded-xl shadow-sm overflow-hidden w-full'>
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-3 sm:p-4">
+      <div className="flex-1 overflow-y-auto p-2 sm:p-4">
         {history.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-emerald-100 flex items-center justify-center mb-3">
@@ -134,7 +134,7 @@ const ChatInterface = () => {
             <p className="text-xs sm:text-sm text-slate-500">Ask me anything about the document!</p>
           </div>
         ) : (
-          <div className="space-y-1">
+          <div className="space-y-1 w-full">
             {history.map(renderMessage)}
           </div>
         )}
@@ -142,7 +142,7 @@ const ChatInterface = () => {
         
         {loading && (
           <div className="flex w-full mb-3 justify-start">
-            <div className="flex items-start gap-2 max-w-[92%]">
+            <div className="flex items-start gap-2 max-w-[95%]">
               <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
                 <Sparkles className='w-3 h-3 sm:w-4 sm:h-4 text-white animate-spin' strokeWidth={2} />
               </div>
