@@ -108,11 +108,12 @@ const QuizManager = ({ documentId }) => {
 
   return (
     <div className='w-full bg-white border border-neutral-200 rounded-lg sm:rounded-xl p-4 sm:p-6'>
-      <div className="flex justify-end gap-2 mb-4">
+      {/* ✅ FIXED: Button on right side, not full-width */}
+      <div className="flex justify-end mb-4">
         <Button 
           onClick={() => setIsGenerateModalOpen(true)}
           size="sm"
-          className="text-xs sm:text-sm"
+          className="text-xs sm:text-sm inline-flex"
         >
           <Plus size={14} className="sm:w-4 sm:h-4" />
           <span className="hidden sm:inline">Generate Quiz</span>
@@ -126,7 +127,8 @@ const QuizManager = ({ documentId }) => {
       <Modal
         isOpen={isGenerateModalOpen}
         onClose={() => setIsGenerateModalOpen(false)}
-        title='Generate New Quiz' >
+        title='Generate New Quiz'
+      >
         <form onSubmit={handleGenerateQuiz} className='space-y-4'>
           <div>
             <label className="block text-xs font-medium text-neutral-700 mb-1.5">
@@ -138,7 +140,7 @@ const QuizManager = ({ documentId }) => {
               onChange={(e) => setNumQuestions(Math.max(1, parseInt(e.target.value) || 1))}
               min='1'
               required
-              className='w-full h-9 sm:h-10 px-3 border border-neutral-200 rounded-lg bg-white text-sm text-neutral-900 placeholder-neutral-400 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-[#00d492] focus:border-transparent'
+              className='w-full h-9 sm:h-10 px-3 border border-neutral-200 rounded-lg bg-white text-sm text-neutral-900 placeholder-neutral-400 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent'
             />
           </div>
           <div className="flex justify-end gap-2">
@@ -172,7 +174,8 @@ const QuizManager = ({ documentId }) => {
       <Modal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-        title='Confirm Delete Quiz' >
+        title='Confirm Delete Quiz'
+      >
         <div className="space-y-4">
           <p className="text-xs sm:text-sm text-neutral-600">
             Are you sure you want to delete the quiz: <span className='font-semibold text-neutral-900 wrap-break-word'>{selectedQuiz?.title || 'this quiz'}</span>? This action cannot be undone.

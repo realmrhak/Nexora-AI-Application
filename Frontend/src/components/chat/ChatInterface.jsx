@@ -79,7 +79,6 @@ const ChatInterface = () => {
     return (
       <div key={index} className={`flex w-full mb-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
         <div className={`flex items-start gap-2 max-w-[95%] sm:max-w-[90%] md:max-w-[85%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
-          {/* Avatar */}
           {!isUser ? (
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 mt-0.5">
               <Sparkles className='w-3 h-3 sm:w-4 sm:h-4 text-white' strokeWidth={2} />
@@ -90,7 +89,6 @@ const ChatInterface = () => {
             </div>
           )}
           
-          {/* Message Bubble - ✅ FIXED: Better text wrapping */}
           <div className={`px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl text-sm leading-relaxed wrap-break-word overflow-hidden min-w-0 ${
             isUser
               ? 'bg-emerald-500 text-white rounded-tr-sm'
@@ -111,7 +109,7 @@ const ChatInterface = () => {
 
   if (initialLoading) {
     return (
-      <div className="flex flex-col h-[60vh] bg-white rounded-xl items-center justify-center shadow-sm">
+      <div className="flex flex-col h-[60vh] sm:h-[80vh] bg-white rounded-xl items-center justify-center shadow-sm w-full">
         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-100 flex items-center justify-center mb-3">
           <MessageSquare className='w-5 h-5 sm:w-6 sm:h-6 text-emerald-600' strokeWidth={2} />
         </div>
@@ -122,9 +120,8 @@ const ChatInterface = () => {
   }
 
   return (
-    <div className='flex flex-col h-[calc(100vh-180px)] sm:h-[70vh] bg-white rounded-xl shadow-sm overflow-hidden w-full'>
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-2 sm:p-4">
+    <div className='flex flex-col h-[calc(100vh-180px)] sm:h-[80vh] bg-white rounded-xl shadow-sm overflow-hidden w-full'>
+      <div className="flex-1 overflow-y-auto p-2 sm:p-4 w-full">
         {history.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-emerald-100 flex items-center justify-center mb-3">
@@ -158,8 +155,7 @@ const ChatInterface = () => {
         )}
       </div>
 
-      {/* Input Area */}
-      <div className="p-2 sm:p-3 border-t border-slate-200 bg-white">
+      <div className="p-2 sm:p-3 border-t border-slate-200 bg-white w-full">
         <form onSubmit={handleSendMessage} className="flex items-center gap-2">
           <input 
             type="text"

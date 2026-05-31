@@ -65,26 +65,27 @@ const DocumentCard = ({ document, onDelete }) => {
         </div>
 
         {/* Stats Section - ✅ Stack on mobile, side-by-side on desktop */}
-        <div className='flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3'>
-          {document.flashcardCount !== undefined && (
-            <div className="flex items-center gap-1.5 px-2 py-1 sm:px-2.5 sm:py-1.5 bg-purple-50 rounded-md sm:rounded-lg w-full sm:w-auto">
-              <BookOpen className='w-3 h-3 sm:w-3.5 sm:h-3.5 text-purple-600' strokeWidth={2} />
-              <span className="text-xs font-semibold text-purple-700">
+        {/* Stats Section - ✅ FIXED: Compact badges, not full width */}
+<div className='flex flex-wrap items-center gap-2 sm:gap-3'>
+    {document.flashcardCount !== undefined && (
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 bg-purple-50 rounded-lg w-auto">
+            <BookOpen className='w-3 h-3 sm:w-3.5 sm:h-3.5 text-purple-600' strokeWidth={2} />
+            <span className="text-xs font-semibold text-purple-700">
                 {document.flashcardCount} <span className="hidden sm:inline">Flashcards</span>
                 <span className="sm:hidden">Cards</span>
-              </span>
-            </div>
-          )}
-          {document.quizCount !== undefined && (
-            <div className="flex items-center gap-1.5 px-2 py-1 sm:px-2.5 sm:py-1.5 bg-emerald-50 rounded-md sm:rounded-lg w-full sm:w-auto">
-              <BrainCircuit className='w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-600' strokeWidth={2} />
-              <span className="text-xs font-semibold text-emerald-700">
+            </span>
+        </div>
+    )}
+    {document.quizCount !== undefined && (
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 bg-emerald-50 rounded-lg w-auto">
+            <BrainCircuit className='w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-600' strokeWidth={2} />
+            <span className="text-xs font-semibold text-emerald-700">
                 {document.quizCount} <span className="hidden sm:inline">Quizzes</span>
                 <span className="sm:hidden">Quiz</span>
-              </span>
-            </div>
-          )}
+            </span>
         </div>
+    )}
+</div>
       </div>
 
       {/* Footer Section */}

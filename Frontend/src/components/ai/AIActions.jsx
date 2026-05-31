@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { Sparkles, BookOpen, Lightbulb } from "lucide-react"; 
+import { Sparkles, BookOpen, Lightbulb } from "lucide-react";
 import aiService from "../../services/aiService";
 import toast from "react-hot-toast";
 import MarkdownRenderer from "../common/MarkdownRenderer";
@@ -119,7 +119,8 @@ const AIActions = () => {
                             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-3 sm:mb-4">
                                 Enter a topic or concept from the document to get a detailed explanation.
                             </p>
-                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                            {/* ✅ FIXED: Input and button on same row, input takes full width */}
+                            <div className="flex items-center gap-2">
                                 <input
                                     type="text"
                                     value={concept}
@@ -131,13 +132,12 @@ const AIActions = () => {
                                 <button
                                     type="submit"
                                     disabled={loadingAction === 'explain' || !concept.trim()}
-                                    className="w-full sm:w-auto shrink-0 h-10 sm:h-11 px-4 sm:px-5 bg-linear-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                                    className="shrink-0 h-10 sm:h-11 px-4 sm:px-5 bg-linear-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
                                 >
                                     {loadingAction === 'explain' ? (
-                                        <span className="flex items-center justify-center gap-2">
+                                        <span className="flex items-center gap-2">
                                             <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                            <span className="hidden sm:inline">Loading...</span>
-                                            <span className="sm:hidden">Loading</span>
+                                            <span className="hidden sm:inline">Loading</span>
                                         </span>
                                     ) : (
                                         'Explain'
@@ -150,7 +150,7 @@ const AIActions = () => {
             </div>
 
             {/* Result Modal */}
-            <Modal 
+            <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 title={modalTitle}
